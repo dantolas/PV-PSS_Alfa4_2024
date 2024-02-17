@@ -1,4 +1,4 @@
-package com.kuta.UDP;
+package com.kuta.udp;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -15,7 +15,7 @@ public class UDPClient {
     private DatagramSocket socket;
     private InetAddress address;
 
-    private byte[] buf;
+    private byte[] buf = new byte[512];
 
     public UDPClient() throws SocketException, UnknownHostException {
         socket = new DatagramSocket();
@@ -27,8 +27,8 @@ public class UDPClient {
         DatagramPacket packet 
         = new DatagramPacket(buf, buf.length, address, 9876);
         socket.send(packet);
-       // packet = new DatagramPacket(buf, buf.length);
-       // socket.receive(packet);
+        packet = new DatagramPacket(buf, buf.length);
+        socket.receive(packet);
         String received = new String(
             packet.getData(), 0, packet.getLength());
         return received;
