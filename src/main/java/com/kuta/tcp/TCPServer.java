@@ -23,6 +23,7 @@ public class TCPServer implements Runnable{
     private int port;
     private ServerSocket server;
     private Socket peer;
+    private boolean running;
 
     public PrintStream sysout;
 
@@ -31,7 +32,7 @@ public class TCPServer implements Runnable{
     public Queue<String> msgHistory;
     public ReadWriteLock lock;
 
-    public TCPServer(InterfaceAddress ip, int port, PrintStream out) {
+    public TCPServer(boolean running,InterfaceAddress ip, int port, PrintStream out) {
         this.ip = ip;
         this.sysout= (out);
         this.port = port;
@@ -49,12 +50,14 @@ public class TCPServer implements Runnable{
         sysout.println(TCP+"|TCP SERVER LISTENING ON "+ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
         try {
             server = new ServerSocket(port,0,ip.getAddress());
-            while(true){
+            while(running){
                 peer = server.accept();
-                new Thread(new TCPHandler(this,new Socket(peer.getInetAddress(),peer.getPort()))).start();
-                break;
+                sysout.println(TCP+"|Handing peer to handler:"+peer.getInetAddress().toString()+peer.getPort());
+                new Thread(new TCPHandler(this,peer)).start();
+                //new Thread(new TCPHandler(this,new Socket(peer.getInetAddress(),peer.getPort()))).start();
             }
         } catch (IOException e) {
+            sysout.println(TCP+"|Error occured on server");
             e.printStackTrace();
         }
         sysout.println(TCP+"|TCP SERVER ENDING|");

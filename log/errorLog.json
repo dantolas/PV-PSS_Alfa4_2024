@@ -1,0 +1,26 @@
+[
+  {
+    "cas": "20.02.2024_20-26-24",
+    "id": "ff204d93-099a-4b6e-a3ba-d44986c52503",
+    "nazev_chyby": "java.net.SocketTimeoutException",
+    "text_chyby": "Receive timed out",
+    "stacktrace": "java.net.SocketTimeoutException: Receive timed out\n\tat java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)\n\tat java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)\n\tat java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)\n\tat java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)\n\tat com.kuta.udp.UDPClient.sendEcho(UDPClient.java:33)\n\tat com.kuta.Main.main(Main.java:61)\n",
+    "konfigurace": {
+      "broadcast_frequency_milis": 5000,
+      "peer_id": "kuta",
+      "default_timeout_milis": 5000
+    }
+  },
+  {
+    "cas": "20.02.2024_20-49-38",
+    "id": "7d007f30-5600-4816-9ffa-2af89800c511",
+    "nazev_chyby": "java.net.SocketTimeoutException",
+    "text_chyby": "Receive timed out",
+    "stacktrace": "java.net.SocketTimeoutException: Receive timed out\n\tat java.base/sun.nio.ch.DatagramChannelImpl.trustedBlockingReceive(DatagramChannelImpl.java:736)\n\tat java.base/sun.nio.ch.DatagramChannelImpl.blockingReceive(DatagramChannelImpl.java:665)\n\tat java.base/sun.nio.ch.DatagramSocketAdaptor.receive(DatagramSocketAdaptor.java:241)\n\tat java.base/java.net.DatagramSocket.receive(DatagramSocket.java:714)\n\tat com.kuta.udp.UDPClient.sendEcho(UDPClient.java:33)\n\tat com.kuta.Main.main(Main.java:68)\n",
+    "konfigurace": {
+      "broadcast_frequency_milis": 5000,
+      "peer_id": "kuta",
+      "default_timeout_milis": 5000
+    }
+  }
+]

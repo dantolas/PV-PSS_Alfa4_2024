@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Scanner;
 
 import com.kuta.util.color.ColorMe;
@@ -17,9 +18,10 @@ public class TCPHandler implements Runnable{
     private Socket peer;
     private Scanner in;
     private PrintWriter out;
+    private final int ID = new Random().nextInt(1000);
 
-    private final String TCPc = ColorMe.purple("TCPc");
 
+    private final String TCPc = ColorMe.purple("TCPc-"+ID);
 
     public TCPHandler(TCPServer server, Socket peer) {
         this.server = server;
@@ -41,10 +43,22 @@ public class TCPHandler implements Runnable{
         }
 
     }
+    public void tearDown(){
+        server.sysout.println(TCPc+"|Shutting down|");
+        in.close();
+        out.close();
+    }
 
 
     @Override
     public void run() {
-        handle();
+        try {
+            setup();
+            handle();
+        } catch (Exception e) {
+        }
+        finally{
+            tearDown();
+        }
     }
 }

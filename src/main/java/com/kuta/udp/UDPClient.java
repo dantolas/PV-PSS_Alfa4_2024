@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 /**
@@ -21,15 +22,25 @@ public class UDPClient {
     public UDPClient(InterfaceAddress addr) throws SocketException, UnknownHostException {
         socket = new DatagramSocket();
         address = addr;
+        socket.setSoTimeout(4000);
     }
 
-    public String sendEcho(String msg) throws IOException {
+    public String sendEcho(String msg){
         buf = msg.getBytes();
         DatagramPacket packet 
         = new DatagramPacket(buf, buf.length, address.getAddress(), 9876);
-        socket.send(packet);
+        try {
+            socket.send(packet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         packet = new DatagramPacket(buf, buf.length);
-        socket.receive(packet);
+        try {
+            socket.receive(packet);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         String received = new String(
             packet.getData(), 0, packet.getLength());
         return received;

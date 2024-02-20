@@ -34,6 +34,7 @@ public class TCPClient {
             sysout.println("Connection established");
             sysout.flush();
         } catch (Exception e) {
+            sysout.println("Error here 1");
             e.printStackTrace();
         }
     }
@@ -52,6 +53,7 @@ public class TCPClient {
         try {
             client.close();
         } catch (IOException e) {
+            sysout.println("Error here 2");
             e.printStackTrace();
         }
     }

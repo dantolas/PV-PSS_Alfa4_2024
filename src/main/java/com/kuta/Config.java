@@ -21,6 +21,11 @@ public class Config {
     public Config() {
     }
 
+    @Override
+    public String toString() {
+        return GsonParser.parser.toJson(this);
+    }
+
     public static Config fromFile(String filepath) throws FileNotFoundException, IOException{
         String json = IO.readFileIntoString(filepath);
         return GsonParser.parser.fromJson(json,Config.class);

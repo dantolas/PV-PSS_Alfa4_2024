@@ -8,12 +8,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.UUID;
 
 import com.kuta.Config;
 import com.kuta.util.IO;
+import com.kuta.util.color.ColorMe;
 import com.kuta.vendor.GsonParser;
 
 /**
@@ -69,6 +68,7 @@ public class LogWriter {
     private static ErrorLog[] jsonToErrorLogArray(String json){
 
         ErrorLog[] errorLogs = GsonParser.parser.fromJson(json,ErrorLog[].class);
+        if(errorLogs == null) errorLogs = new ErrorLog[0];
         return errorLogs;
     }
 
@@ -144,12 +144,6 @@ public class LogWriter {
         }
 
 
-    }
-
-    public static Queue<ErrorLog> getErrorLogStack() throws FileNotFoundException, IOException{
-        String json = IO.readFileIntoString(errorLogPath+ERROR_FILE_NAME);
-        Queue<ErrorLog> queue = new LinkedList<>(Arrays.asList(jsonToErrorLogArray(json)));
-        return queue;
     }
 
     public static ErrorLog[] getErrorLogArray() throws FileNotFoundException, IOException{

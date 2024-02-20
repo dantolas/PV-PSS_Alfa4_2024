@@ -41,7 +41,7 @@ public class UDPServer implements Runnable{
     public final Gson GSON; 
     private HashMap<SocketAddress,String> knownPeers;
 
-    public UDPServer(InterfaceAddress ip,int port,PrintStream outStream,String peerId,int broadcastTimer,int defaultTimeout) throws SocketException {
+    public UDPServer(boolean running,InterfaceAddress ip,int port,PrintStream outStream,String peerId,int broadcastTimer,int defaultTimeout) throws SocketException {
         knownPeers = new HashMap<>();
         this.out = outStream;
         this.port = port;
@@ -65,7 +65,7 @@ public class UDPServer implements Runnable{
 
         String msgRec = new String(p.getData(), 0, p.getLength());
 
-        String response = "|UDP Server received this message:"+msgRec;
+        String response = "|Received this message:"+ColorMe.green(msgRec);
         out.println(UDP+response);
 
         Matcher m = Pattern.compile(MSG_SPLIT_REGEX).matcher(msgRec);
@@ -90,11 +90,12 @@ public class UDPServer implements Runnable{
 
             if(knownPeers.containsKey(p.getSocketAddress())) return;
             knownPeers.put(p.getSocketAddress(),answer.peerId);
-            out.println(UDP+"|Added peer:"+answer.peerId+"@"+p.getSocketAddress());
+            out.println(UDP+"|Added peer:"+ColorMe.green(answer.peerId)+"@"+ColorMe.green(p.getSocketAddress().toString()));
+            p = newPacket(p.getAddress(),p.getPort(),"Answer processed");
+            socket.send(p);
             TCPClient client = new TCPClient(p.getAddress(),9876,out);
             client.startConnection();
-            client.stopConnection();
-            socket.send(p);
+            //client.stopConnection();
         }
     }
     
