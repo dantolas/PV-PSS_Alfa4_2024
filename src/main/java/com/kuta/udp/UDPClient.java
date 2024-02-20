@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
@@ -13,19 +14,19 @@ import java.net.UnknownHostException;
 public class UDPClient {
 
     private DatagramSocket socket;
-    private InetAddress address;
+    private InterfaceAddress address;
 
     private byte[] buf = new byte[512];
 
-    public UDPClient() throws SocketException, UnknownHostException {
+    public UDPClient(InterfaceAddress addr) throws SocketException, UnknownHostException {
         socket = new DatagramSocket();
-        address = InetAddress.getByName("localhost");
+        address = addr;
     }
 
     public String sendEcho(String msg) throws IOException {
         buf = msg.getBytes();
         DatagramPacket packet 
-        = new DatagramPacket(buf, buf.length, address, 9876);
+        = new DatagramPacket(buf, buf.length, address.getAddress(), 9876);
         socket.send(packet);
         packet = new DatagramPacket(buf, buf.length);
         socket.receive(packet);

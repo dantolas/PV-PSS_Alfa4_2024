@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.kuta.tcp.TCPClient;
 import com.kuta.vendor.GsonParser;
 
 /**
@@ -86,6 +87,8 @@ public class UDPServer implements Runnable{
         if(m.group(1).equalsIgnoreCase("q")){
             out.println("Question received");
             UDPQuestion question = GSON.fromJson(content,UDPQuestion.class);
+            if(question.peerId == null || question.peerId.equals("")) return;
+            out.println("Sending response to:"+question.peerId);
             p = createAnswer(p);
             socket.send(p);
             return;
@@ -100,22 +103,24 @@ public class UDPServer implements Runnable{
             if(knownPeers.containsKey(p.getSocketAddress())) return;
             knownPeers.put(p.getSocketAddress(),answer.peerId);
             out.println("Added peer:"+answer.peerId+"@"+p.getSocketAddress());
+            TCPClient client = new TCPClient(p.getAddress(),9876,out);
+            client.startConnection();
+            out.println(client.sendMessage("Hello there"));
+            client.stopConnection();
             socket.send(p);
 
         }
-
-
     }
     
 
     @Override
     public void run() {
-        out.println("|UDP SERVER STARTED|");
+        out.println("|STARTING UDP SERVER|");
         running = true;
         DatagramPacket packet = new DatagramPacket(buf,0,buf.length);
         out.println("|UDP SERVER RUNNING ON "+ip.getAddress()+":"+port+"|");
         long lastBSTime = System.currentTimeMillis();
-        out.println("|SENDING FIRST BROADCAST|");
+        out.println("|SENDING FIRST BROADCAST TO "+ip.getBroadcast()+":"+port+"|");
         try {
             
             broadcastHello();
@@ -134,7 +139,6 @@ public class UDPServer implements Runnable{
                     handlePacket(packet);
 
                 }catch (SocketTimeoutException e){
-                    out.println("No msg received.");
                     continue;
                 } 
             } 

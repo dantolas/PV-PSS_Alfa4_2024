@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.net.SocketException;
 
 import com.kuta.util.log.LogWriter;
+import com.kuta.util.log.LogWriterInitException;
 
 /**
  * errorHandler
@@ -38,6 +39,11 @@ public class ErrorHandler {
         } catch (IOException e1) {
             out.println("Couldn't write log, trying to reinitialize...");
         }
+    }
+
+    public void handle(LogWriterInitException e){
+        out.println("|ERROR| Cannot find or access the error log file. Please ensure that the file"+
+            " log/errorLog.json exists and has correct permissions and restart the program");
     }
 
 

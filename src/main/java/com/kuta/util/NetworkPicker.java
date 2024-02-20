@@ -41,6 +41,11 @@ public class NetworkPicker {
             }
         }
 
+        if(options.isEmpty()){
+            out.println("No viable ipv4 address found. Make sure you are connected to a network.");
+            return null;
+        }
+
         int i = 1;
         for (InterfaceAddress ip: options) {
             out.println("##################");
