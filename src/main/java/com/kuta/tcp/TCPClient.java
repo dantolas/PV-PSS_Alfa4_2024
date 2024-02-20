@@ -32,7 +32,7 @@ public class TCPClient {
             out = new PrintWriter(client.getOutputStream(), true);
             in = new Scanner(client.getInputStream());
             sysout.println("Connection established");
-            sysout.println(in.nextLine());
+            sysout.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -46,6 +46,7 @@ public class TCPClient {
     }
 
     public void stopConnection() {
+        sysout.println("Closing tcp connection");
         in.close();
         out.close();
         try {

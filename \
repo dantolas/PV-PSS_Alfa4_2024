@@ -9,8 +9,6 @@ import java.net.Socket;
 import java.util.Queue;
 import java.util.Scanner;
 
-import com.kuta.util.color.ColorMe;
-
 /**
  * TCPSocket
  */
@@ -25,7 +23,6 @@ public class TCPServer implements Runnable{
     private PrintWriter out;
     private Scanner in;
 
-    private final String TCP = ColorMe.yellow("TCP");
     private Queue<String> msgHistory;
 
     public TCPServer(InterfaceAddress ip, int port, PrintStream out) {
@@ -39,22 +36,21 @@ public class TCPServer implements Runnable{
 
     @Override
     public void run() {
-        sysout.println(TCP+"|STARTING TCP SERVER|");
-        sysout.println(TCP+"|TCP SERVER LISTENING ON "+ip.getAddress()+":"+port+"|");
+        sysout.println("|STARTING TCP SERVER|");
+        sysout.println("|TCP SERVER LISTENING ON "+ip.getAddress()+":"+port+"|");
         try {
             server = new ServerSocket(port,0,ip.getAddress());
             while(true){
                 peer = server.accept();
-                sysout.println(TCP+peer.getLocalSocketAddress());
-                sysout.println(TCP+" Accepted connection from:"+peer.getInetAddress()+":"+peer.getLocalPort());
+                sysout.println(peer.getLocalSocketAddress());
+                sysout.println("Accepted connection from:"+peer.getInetAddress()+":"+peer.getLocalPort());
+                sysout.flush();
                 out = new PrintWriter(peer.getOutputStream(),true);
                 in = new Scanner(peer.getInputStream());
-                break;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        sysout.println(TCP+"|TCP SERVER ENDING|");
     }
 
     

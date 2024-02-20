@@ -45,7 +45,7 @@ public class Main {
 
             config = Config.fromFile(wd+"/conf/config.json");
             LogWriter.Init(config);
-            new Thread(new UDPServer(picked,9876,System.out,config.peerId,config.broadcastFrequency)).start();
+            new Thread(new UDPServer(picked,9876,System.out,config.peerId,config.broadcastFrequency,config.defaultTimeout)).start();
             new Thread(new TCPServer(picked, 9876, System.out)).start();
             UDPClient client = new UDPClient(picked);
 

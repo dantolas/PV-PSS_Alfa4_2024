@@ -12,6 +12,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
 
+import com.kuta.util.color.ColorMe;
+
 /**
  * NetworkPicker
  */
@@ -50,12 +52,12 @@ public class NetworkPicker {
         for (InterfaceAddress ip: options) {
             out.println("##################");
             out.println("("+i+")");
-            out.println("Hostname:"+ip.getAddress().getHostName());
-            out.println("IPv4:"+ip.getAddress());
-            out.println("Broadcast:"+ip.getBroadcast());
+            out.println("- "+ColorMe.green("Hostname")+":"+ip.getAddress().getHostName());
+            out.println("- "+ColorMe.green("IPv4")+":"+ip.getAddress());
+            out.println("- "+ColorMe.green("Broadcast IP")+":"+ip.getBroadcast());
             i++;
         }
-        out.println("Please select the address to be used.");
+        out.println(ColorMe.blue("Please pick the ip addr to listen to."));
         int input = readInputInt(1,options.size());
         return options.get(input-1);
     }
