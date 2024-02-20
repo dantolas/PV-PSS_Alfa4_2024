@@ -6,8 +6,11 @@ import java.io.PrintWriter;
 import java.net.InterfaceAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.kuta.util.color.ColorMe;
 
@@ -21,17 +24,20 @@ public class TCPServer implements Runnable{
     private ServerSocket server;
     private Socket peer;
 
-    private PrintStream sysout;
-    private PrintWriter out;
-    private Scanner in;
+    public PrintStream sysout;
 
     private final String TCP = ColorMe.yellow("TCP");
-    private Queue<String> msgHistory;
+
+    public Queue<String> msgHistory;
+    public ReadWriteLock lock;
 
     public TCPServer(InterfaceAddress ip, int port, PrintStream out) {
         this.ip = ip;
         this.sysout= (out);
         this.port = port;
+
+        this.msgHistory = new LinkedList<>();
+        this.lock = new ReentrantReadWriteLock();
     }
 
 
@@ -45,10 +51,7 @@ public class TCPServer implements Runnable{
             server = new ServerSocket(port,0,ip.getAddress());
             while(true){
                 peer = server.accept();
-                sysout.println(TCP+peer.getLocalSocketAddress());
-                sysout.println(TCP+" Accepted connection from:"+peer.getInetAddress()+":"+peer.getLocalPort());
-                out = new PrintWriter(peer.getOutputStream(),true);
-                in = new Scanner(peer.getInputStream());
+                new Thread(new TCPHandler(this,new Socket(peer.getInetAddress(),peer.getPort()))).start();
                 break;
             }
         } catch (IOException e) {

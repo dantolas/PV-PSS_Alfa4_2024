@@ -95,7 +95,6 @@ public class UDPServer implements Runnable{
             client.startConnection();
             client.stopConnection();
             socket.send(p);
-
         }
     }
     
@@ -158,12 +157,12 @@ public class UDPServer implements Runnable{
             } 
         }
         catch (IOException e) {
+            out.println(UDP+"|Couldn't send broadcast.|");
             e.printStackTrace();
         }
         catch(Exception e){
             e.printStackTrace();
         }finally{
-
             tearDown();
         }
     }

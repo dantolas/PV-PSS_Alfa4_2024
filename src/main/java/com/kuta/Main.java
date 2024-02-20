@@ -52,11 +52,16 @@ public class Main {
             String answer= "A: {\"status\":\"ok\",\"peer_id\":\"molic-peer1\"}";
             String question = "Q: {\"command\":\"hello\",\"peer_id\":\"molic-peer1\"}";
             while(true){
-                if(in.nextLine().equals("a")){
-                    client.sendEcho(answer);
+                String input = in.nextLine();
+                if(input.equals("a")){
+                    System.out.println(client.sendEcho(answer));
                     continue;
                 }
-                System.out.println(client.sendEcho(question));
+                if(input.equals("q")){
+                    System.out.println(client.sendEcho(question));
+                    continue;
+                }
+                System.out.println(client.sendEcho("Random msg :]"));
             }
 
         }
