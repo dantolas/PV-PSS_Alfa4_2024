@@ -40,7 +40,7 @@ public class TCPServer implements Runnable{
     @Override
     public void run() {
         sysout.println(TCP+"|STARTING TCP SERVER|");
-        sysout.println(TCP+"|TCP SERVER LISTENING ON "+ip.getAddress()+":"+port+"|");
+        sysout.println(TCP+"|TCP SERVER LISTENING ON "+ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
         try {
             server = new ServerSocket(port,0,ip.getAddress());
             while(true){

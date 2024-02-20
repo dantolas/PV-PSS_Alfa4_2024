@@ -32,7 +32,7 @@ public class UDPServer implements Runnable{
     private boolean running;
     private PrintStream out;
     private byte[] buf = new byte[512];
-    private final String UDP = ColorMe.green("UDP");
+    private final String UDP = ColorMe.purple("UDP");
 
     private final int  BROADCAST_TIMER; //Miliseconds
     private final int DEFAULT_TIMEOUT; //Miliseconds
@@ -118,7 +118,7 @@ public class UDPServer implements Runnable{
 
         out.println(UDP+"|STARTING UDP SERVER|");
         running = true;
-        out.println(UDP+"|UDP SERVER RUNNING ON "+ColorMe.green(ip.getAddress().toString()+":"+port+"|"));
+        out.println(UDP+"|UDP SERVER RUNNING ON "+ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
         socket.setSoTimeout(DEFAULT_TIMEOUT);
     }
 
