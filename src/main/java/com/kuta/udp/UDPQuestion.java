@@ -18,5 +18,9 @@ public class UDPQuestion{
     public UDPQuestion() {
     }
 
+    public boolean isValid(){
+        return command != null && peerId != null;
+    }
+
 
 }

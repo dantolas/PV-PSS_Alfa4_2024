@@ -19,6 +19,10 @@ public class UDPAnswer{
         this.peerId = peerId;
     }
 
+    public boolean isValid(){
+        return status != null && peerId != null;
+    }
+
 
 
 

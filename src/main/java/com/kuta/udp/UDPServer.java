@@ -55,7 +55,7 @@ public class UDPServer implements Runnable{
     }
 
     private void broadcastHello() throws IOException{
-        DatagramPacket helloPacket = newPacket(ip.getBroadcast(),port,"Q: {\"command\":\"hello\",\"peer_id\":\""+PEER_ID+"\"}");
+        DatagramPacket helloPacket = newPacket(ip.getBroadcast(),port,"{\"command\":\"hello\",\"peer_id\":\""+PEER_ID+"\"}");
         socket.send(helloPacket);
     }
 
@@ -70,13 +70,22 @@ public class UDPServer implements Runnable{
         out.println(UDP+response);
 
         Matcher m = pattern.matcher(msgRec);
-        if(!m.find()){out.println(
-            UDP+"|Matcher didn't match");
-            socket.send(p);
-            return;
-        };
 
         String content = msgRec.replaceFirst(MSG_SPLIT_REGEX,"");
+
+        try {
+            UDPQuestion question = GSON.fromJson(content,UDPQuestion.class);
+            out.println(UDP+"Question valid:"+question.isValid());
+        } catch (Exception e) {
+            out.println(UDP+"Failed parsing question.");
+        }
+        try {
+            UDPAnswer answer= GSON.fromJson(content,UDPAnswer.class);
+            out.println(UDP+"Answer valid:"+answer.isValid());
+        } catch (Exception e) {
+            out.println(UDP+"Failed parsing answer.");
+        }
+
         if(m.group(1).equalsIgnoreCase("q")){
             out.println(UDP+"|Question received");
             UDPQuestion question = GSON.fromJson(content,UDPQuestion.class);
@@ -109,7 +118,7 @@ public class UDPServer implements Runnable{
     };
 
     private DatagramPacket createAnswer(DatagramPacket question){
-        String answerMsg = "A: {\"status\":\"ok\",\"peer_id\":\""+PEER_ID+"\"}";
+        String answerMsg = "{\"status\":\"ok\",\"peer_id\":\""+PEER_ID+"\"}";
         return new DatagramPacket(answerMsg.getBytes(),answerMsg.getBytes().length,question.getSocketAddress());
     }
 
