@@ -59,6 +59,28 @@ public class UDPServer implements Runnable{
         socket.send(helloPacket);
     }
 
+    private void handleQuestion(UDPQuestion question,DatagramPacket p) throws IOException{
+            out.println(UDP+"|Question received");
+            out.println(UDP+"|Sending response to:"+question.peerId);
+            p = createAnswer(p);
+            socket.send(p);
+            return;
+    }
+
+    private void handleAnswer(UDPAnswer answer, DatagramPacket p) throws IOException{
+        out.println(UDP+"|Answer received");
+        if(!answer.status.equalsIgnoreCase("ok")) return;
+        if(knownPeers.containsKey(p.getSocketAddress())) return;
+
+        knownPeers.put(p.getSocketAddress(),answer.peerId);
+        out.println(UDP+"|Added peer:"+ColorMe.green(answer.peerId)+"@"+ColorMe.green(p.getSocketAddress().toString()));
+        p = newPacket(p.getAddress(),p.getPort(),UDP+"|Answer processed, will attempt TCP conn to "+answer.peerId);
+        socket.send(p);
+       // TCPClient client = new TCPClient(p.getAddress(),9876,out);
+       // client.startConnection();
+        //client.stopConnection();
+    }
+
     private void handlePacket(DatagramPacket p) throws IOException{
         if(p.getSocketAddress().equals(socket.getLocalSocketAddress())){
             return;
@@ -69,47 +91,19 @@ public class UDPServer implements Runnable{
         String response = "|Received this message:"+ColorMe.green(msgRec);
         out.println(UDP+response);
 
-        Matcher m = pattern.matcher(msgRec);
-
         String content = msgRec.replaceFirst(MSG_SPLIT_REGEX,"");
 
         try {
             UDPQuestion question = GSON.fromJson(content,UDPQuestion.class);
-            out.println(UDP+"Question valid:"+question.isValid());
+            if(question.isValid()) { handleQuestion(question,p); return; }
         } catch (Exception e) {
-            out.println(UDP+"Failed parsing question.");
+            out.println(UDP+"|Failed parsing question.");
         }
         try {
             UDPAnswer answer= GSON.fromJson(content,UDPAnswer.class);
-            out.println(UDP+"Answer valid:"+answer.isValid());
+            if(answer.isValid()) {handleAnswer(answer,p); return;}
         } catch (Exception e) {
-            out.println(UDP+"Failed parsing answer.");
-        }
-
-        if(m.group(1).equalsIgnoreCase("q")){
-            out.println(UDP+"|Question received");
-            UDPQuestion question = GSON.fromJson(content,UDPQuestion.class);
-            if(question.peerId == null || question.peerId.equals("")) return;
-            out.println(UDP+"|Sending response to:"+question.peerId);
-            p = createAnswer(p);
-            socket.send(p);
-            return;
-        }
-
-        if(m.group(1).equalsIgnoreCase("a")){
-            out.println(UDP+"|Answer received");
-            UDPAnswer answer = GSON.fromJson(content,UDPAnswer.class);
-            if(!answer.status.equalsIgnoreCase("ok")) return;
-            if(answer.peerId.length()< 1) return;
-
-            if(knownPeers.containsKey(p.getSocketAddress())) return;
-            knownPeers.put(p.getSocketAddress(),answer.peerId);
-            out.println(UDP+"|Added peer:"+ColorMe.green(answer.peerId)+"@"+ColorMe.green(p.getSocketAddress().toString()));
-            p = newPacket(p.getAddress(),p.getPort(),UDP+"|Answer processed, will attempt TCP conn to "+answer.peerId);
-            socket.send(p);
-            TCPClient client = new TCPClient(p.getAddress(),9876,out);
-            client.startConnection();
-            //client.stopConnection();
+            out.println(UDP+"|Failed parsing answer.");
         }
     }
     
