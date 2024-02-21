@@ -38,15 +38,6 @@ public class UDPClient {
             e.printStackTrace();
         }
         packet = new DatagramPacket(buf, buf.length);
-        try {
-            socket.receive(packet);
-        } 
-        catch(SocketTimeoutException e){
-
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
         String received = new String(
             packet.getData(), 0, packet.getLength());
         return received;

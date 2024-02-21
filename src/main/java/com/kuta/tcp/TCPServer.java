@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.net.InterfaceAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -24,47 +25,59 @@ public class TCPServer implements Runnable{
     private ServerSocket server;
     private Socket peer;
     private boolean running;
+    private final int HANDLER_TIMEOUT;
 
     public PrintStream sysout;
 
     private final String TCP = ColorMe.yellow("TCP");
 
-    public Queue<String> msgHistory;
-    public ReadWriteLock lock;
+    public HashMap<String,Message> msgHistory;
+    public ReadWriteLock locks;
 
-    public TCPServer(boolean running,InterfaceAddress ip, int port, PrintStream out) {
+    public TCPServer(boolean running,InterfaceAddress ip, int port, PrintStream out, int handlerTimeout) {
         this.ip = ip;
         this.sysout= (out);
         this.port = port;
-
-        this.msgHistory = new LinkedList<>();
-        this.lock = new ReentrantReadWriteLock();
+        this.HANDLER_TIMEOUT = handlerTimeout;
+        this.msgHistory = new HashMap<>();
+        this.locks = new ReentrantReadWriteLock();
     }
 
 
     public void setup(){
+        sysout.println(TCP+"|STARTING TCP SERVER|");
+        sysout.println(TCP+"|TCP SERVER LISTENING ON "+ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
         running = true;
+    }
+
+    public void tearDown(){
+        sysout.println(TCP+"|TCP SERVER TEARING DOWN|");
+        try {
+            server.close();
+        } catch (IOException e) {
+        }
+        sysout.println(TCP+"|TCP SERVER ENDED|");
     }
 
 
     @Override
     public void run() {
-        
-        sysout.println(TCP+"|STARTING TCP SERVER|");
-        sysout.println(TCP+"|TCP SERVER LISTENING ON "+ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
+        setup();
         try {
             server = new ServerSocket(port,0,ip.getAddress());
             while(running){
                 peer = server.accept();
-                sysout.println(TCP+"|Handing peer to handler:"+peer.getInetAddress().toString()+peer.getPort());
-                new Thread(new TCPHandler(this,peer)).start();
+                sysout.println(TCP+"|Handing peer to handler:"+ColorMe.green(peer.getInetAddress().toString()+":"+peer.getPort()));
+                new Thread(new TCPHandler(this,peer,HANDLER_TIMEOUT)).start();
                 //new Thread(new TCPHandler(this,new Socket(peer.getInetAddress(),peer.getPort()))).start();
             }
         } catch (IOException e) {
-            sysout.println(TCP+"|Error occured on server");
+            sysout.println(TCP+ColorMe.red("|Error occured on server"));
             e.printStackTrace();
         }
-        sysout.println(TCP+"|TCP SERVER ENDING|");
+        finally{
+            tearDown();
+        }
     }
 
     

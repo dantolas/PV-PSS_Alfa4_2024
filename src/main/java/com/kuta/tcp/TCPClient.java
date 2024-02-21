@@ -7,34 +7,41 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Scanner;
 
+import com.kuta.util.color.ColorMe;
+
 /**
  * TCPClient
  */
-public class TCPClient {
+public class TCPClient implements Runnable{
     private Socket client;
+    private String serverPeerId;
     private PrintStream sysout;
     private PrintWriter out;
     private Scanner in;
 
+    private final String TCPc;
+
     private InetAddress ip;
     private int port;
 
-    public TCPClient(InetAddress ip, int port, PrintStream sysout) {
+    public TCPClient(InetAddress ip, int port,String serverPeerId, PrintStream sysout) {
         this.sysout = (sysout);
         this.ip = ip;
         this.port = port;
+        this.serverPeerId = serverPeerId;
+        this.TCPc = ColorMe.yellow("TCPc-"+serverPeerId);
     }
 
-    public void startConnection() {
-        sysout.println("Attempting connection to:"+ip+":"+port);
+    public void setup() {
+        sysout.println(TCPc+"|Attempting connection to "+ColorMe.green(serverPeerId)+ip+":"+port);
         try {
             client = new Socket(ip, port);
             out = new PrintWriter(client.getOutputStream(), true);
             in = new Scanner(client.getInputStream());
-            sysout.println("Connection established");
+            sysout.println(TCPc+"|Connection established");
             sysout.flush();
         } catch (Exception e) {
-            sysout.println("Error here 1");
+            sysout.println(TCPc+"|Error here 1");
             e.printStackTrace();
         }
     }
@@ -47,15 +54,22 @@ public class TCPClient {
     }
 
     public void stopConnection() {
-        sysout.println("Closing tcp connection");
+        sysout.println(TCPc+"|Closing tcp connection");
         in.close();
         out.close();
         try {
             client.close();
         } catch (IOException e) {
-            sysout.println("Error here 2");
+            sysout.println(TCPc+"|Error here 2");
             e.printStackTrace();
         }
+        sysout.println(TCPc+"|Connection closed");
+    }
+
+    @Override
+    public void run() {
+        setup();
+        stopConnection();
     }
     
 }

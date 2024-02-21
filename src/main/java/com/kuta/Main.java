@@ -46,7 +46,7 @@ public class Main {
             LogWriter.Init(config);
 
             new Thread(new UDPServer(running,picked,9876,System.out,config.peerId,config.broadcastFrequency,config.defaultTimeout)).start();
-            new Thread(new TCPServer(running,picked, 9876, System.out)).start();
+            new Thread(new TCPServer(running,picked, 9876, System.out,30_000)).start();
             UDPClient client = new UDPClient(picked);
 
             String answer= "A: {\"status\":\"ok\",\"peer_id\":\"molic-peer1\"}";
@@ -54,11 +54,11 @@ public class Main {
             while(running){
                 String input = in.nextLine();
                 if(input.equals("a")){
-                    System.out.println(client.sendEcho(answer));
+                    client.sendEcho(answer);
                     continue;
                 }
                 if(input.equals("q")){
-                    System.out.println(client.sendEcho(question));
+                    client.sendEcho(question);
                     continue;
                 }
                 System.out.println(client.sendEcho("Random msg :]"));

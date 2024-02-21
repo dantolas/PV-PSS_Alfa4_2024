@@ -10,8 +10,6 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
 import com.kuta.tcp.TCPClient;
@@ -38,7 +36,6 @@ public class UDPServer implements Runnable{
     private final int DEFAULT_TIMEOUT; //Miliseconds
     private final String PEER_ID;
     private final String MSG_SPLIT_REGEX = "^\\s*(\\w)\\s*[:;,-_=]*\\s*";
-    private final Pattern pattern = Pattern.compile(MSG_SPLIT_REGEX);
     public final Gson GSON; 
     private HashMap<SocketAddress,String> knownPeers;
 
@@ -74,11 +71,10 @@ public class UDPServer implements Runnable{
 
         knownPeers.put(p.getSocketAddress(),answer.peerId);
         out.println(UDP+"|Added peer:"+ColorMe.green(answer.peerId)+"@"+ColorMe.green(p.getSocketAddress().toString()));
-        p = newPacket(p.getAddress(),p.getPort(),UDP+"|Answer processed, will attempt TCP conn to "+answer.peerId);
+        p = newPacket(p.getAddress(),p.getPort(),UDP+"|Answer fine,will attempt TCP conn to "+answer.peerId);
         socket.send(p);
-       // TCPClient client = new TCPClient(p.getAddress(),9876,out);
-       // client.startConnection();
-        //client.stopConnection();
+        new Thread(new TCPClient(p.getAddress(),9876,answer.peerId,out)).start();
+        return;
     }
 
     private void handlePacket(DatagramPacket p) throws IOException{
@@ -88,8 +84,7 @@ public class UDPServer implements Runnable{
 
         String msgRec = new String(p.getData(), 0, p.getLength());
 
-        String response = "|Received this message:"+ColorMe.green(msgRec);
-        out.println(UDP+response);
+        out.println(UDP+"|Received this message:"+msgRec);
 
         String content = msgRec.replaceFirst(MSG_SPLIT_REGEX,"");
 
@@ -97,14 +92,13 @@ public class UDPServer implements Runnable{
             UDPQuestion question = GSON.fromJson(content,UDPQuestion.class);
             if(question.isValid()) { handleQuestion(question,p); return; }
         } catch (Exception e) {
-            out.println(UDP+"|Failed parsing question.");
         }
         try {
             UDPAnswer answer= GSON.fromJson(content,UDPAnswer.class);
             if(answer.isValid()) {handleAnswer(answer,p); return;}
         } catch (Exception e) {
-            out.println(UDP+"|Failed parsing answer.");
         }
+        return;
     }
     
     private DatagramPacket newPacket(InetAddress ip, int port,String msg){
@@ -135,20 +129,21 @@ public class UDPServer implements Runnable{
         try {
             setup();
         } catch (SocketException e) {
-            out.println(UDP+"|UDP SETUP FAILED, SERVER TEARING DOWN|");
+            out.println(UDP+ColorMe.red("|ERROR|")+"|UDP SETUP FAILED|");
             tearDown();
             return;
         }
 
         DatagramPacket packet = new DatagramPacket(buf,0,buf.length);
         long lastBSTime = System.currentTimeMillis();
-        out.println(UDP+"|SENDING FIRST BROADCAST TO "+ip.getBroadcast()+":"+port+"|");
+        out.println(UDP+"|SENDING FIRST BROADCAST TO "+ColorMe.green(ip.getBroadcast()+":"+Integer.toString(port)));
         try {
             
             broadcastHello();
 
             while (running) {
                 long timeSinceBS = (System.currentTimeMillis()-lastBSTime);
+                out.println(UDP+"Time since broadcast"+timeSinceBS);
                 if(timeSinceBS >= BROADCAST_TIMER){
                     lastBSTime = System.currentTimeMillis();
                     out.println(UDP+"|SENDING BROADCAST|");
@@ -156,6 +151,8 @@ public class UDPServer implements Runnable{
                 }
                 try {
                     int timeout = Math.abs((int)(BROADCAST_TIMER - timeSinceBS));
+                    if(timeout < 0) timeout = DEFAULT_TIMEOUT;
+                    out.println(UDP+"Setting listen timeout"+timeout);
                     socket.setSoTimeout(timeout);
                     socket.receive(packet);
                     handlePacket(packet);
@@ -175,8 +172,4 @@ public class UDPServer implements Runnable{
             tearDown();
         }
     }
-
-    
-
-
 }
