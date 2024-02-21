@@ -42,10 +42,14 @@ public class TCPServer implements Runnable{
     }
 
 
+    public void setup(){
+        running = true;
+    }
 
 
     @Override
     public void run() {
+        
         sysout.println(TCP+"|STARTING TCP SERVER|");
         sysout.println(TCP+"|TCP SERVER LISTENING ON "+ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
         try {

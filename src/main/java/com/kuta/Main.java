@@ -1,24 +1,18 @@
 package com.kuta;
 
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Scanner;
 
+import com.kuta.tcp.TCPServer;
+import com.kuta.udp.UDPClient;
 import com.kuta.udp.UDPServer;
-import com.kuta.util.log.LogWriterInitException;
 import com.kuta.util.ErrorHandler;
 import com.kuta.util.NetworkPicker;
 import com.kuta.util.color.ColorMe;
 import com.kuta.util.log.LogWriter;
-import com.kuta.tcp.TCPServer;
-import com.kuta.udp.UDPClient;
+import com.kuta.util.log.LogWriterInitException;
 
 public class Main {
     public static void main(String[] args) {

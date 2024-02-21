@@ -38,6 +38,7 @@ public class UDPServer implements Runnable{
     private final int DEFAULT_TIMEOUT; //Miliseconds
     private final String PEER_ID;
     private final String MSG_SPLIT_REGEX = "^\\s*(\\w)\\s*[:;,-_=]*\\s*";
+    private final Pattern pattern = Pattern.compile(MSG_SPLIT_REGEX);
     public final Gson GSON; 
     private HashMap<SocketAddress,String> knownPeers;
 
@@ -68,8 +69,12 @@ public class UDPServer implements Runnable{
         String response = "|Received this message:"+ColorMe.green(msgRec);
         out.println(UDP+response);
 
-        Matcher m = Pattern.compile(MSG_SPLIT_REGEX).matcher(msgRec);
-        if(!m.find()){out.println(UDP+"|Matcher didn't match");return;};
+        Matcher m = pattern.matcher(msgRec);
+        if(!m.find()){out.println(
+            UDP+"|Matcher didn't match");
+            socket.send(p);
+            return;
+        };
 
         String content = msgRec.replaceFirst(MSG_SPLIT_REGEX,"");
         if(m.group(1).equalsIgnoreCase("q")){
@@ -91,7 +96,7 @@ public class UDPServer implements Runnable{
             if(knownPeers.containsKey(p.getSocketAddress())) return;
             knownPeers.put(p.getSocketAddress(),answer.peerId);
             out.println(UDP+"|Added peer:"+ColorMe.green(answer.peerId)+"@"+ColorMe.green(p.getSocketAddress().toString()));
-            p = newPacket(p.getAddress(),p.getPort(),"Answer processed");
+            p = newPacket(p.getAddress(),p.getPort(),UDP+"|Answer processed, will attempt TCP conn to "+answer.peerId);
             socket.send(p);
             TCPClient client = new TCPClient(p.getAddress(),9876,out);
             client.startConnection();

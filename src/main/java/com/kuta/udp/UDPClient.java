@@ -17,7 +17,7 @@ public class UDPClient {
     private DatagramSocket socket;
     private InterfaceAddress address;
 
-    private byte[] buf = new byte[512];
+    private byte[] buf = new byte[1024];
 
     public UDPClient(InterfaceAddress addr) throws SocketException, UnknownHostException {
         socket = new DatagramSocket();
@@ -27,18 +27,24 @@ public class UDPClient {
 
     public String sendEcho(String msg){
         buf = msg.getBytes();
-        DatagramPacket packet 
-        = new DatagramPacket(buf, buf.length, address.getAddress(), 9876);
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, address.getAddress(), 9876);
         try {
             socket.send(packet);
-        } catch (IOException e) {
+        }
+        catch(SocketTimeoutException e){
+
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
         packet = new DatagramPacket(buf, buf.length);
         try {
             socket.receive(packet);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+        } 
+        catch(SocketTimeoutException e){
+
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
         String received = new String(
