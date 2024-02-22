@@ -78,14 +78,7 @@ public class TCPClient implements Runnable{
         long timeStartedWaiting = System.currentTimeMillis();
         while(resp == null){
             long waitingTime = System.currentTimeMillis() - timeStartedWaiting;
-            sysout.println(waitingTime == 0);
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-            }
-            sysout.println(TCPc+"|Current waiting time:"+waitingTime);
             checkTimeout(waitingTime);
-            sysout.println(TCPc+"Now going to read");
             resp = in.nextLine();
         }
         return resp;
@@ -103,9 +96,10 @@ public class TCPClient implements Runnable{
             sysout.println(TCPc+"|Sending this msg to server:"+HELLO);
             sysout.println(TCPc+"|"+send(HELLO));
             while(true){
-                Thread.sleep(2000);
+                Thread.sleep(1000);
                 sysout.println(TCPc+"|Sending msg");
-                sysout.println(TCPc+"|"+send(newMessage("Hello there")));
+                String response = send(newMessage("Hello there"));
+                sysout.println(TCPc+"|"+response);
             }
         } catch (TimeoutException e) {
             sysout.println(TCPc+"|Connection timed out");

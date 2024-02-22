@@ -29,8 +29,9 @@ public class TCPServer implements Runnable{
 
     public HashMap<String,Message> msgHistory;
     public ReadWriteLock locks;
+    public int msgLimit;
 
-    public TCPServer(boolean running,InterfaceAddress ip, int port, PrintStream out, int handlerTimeout) {
+    public TCPServer(boolean running,InterfaceAddress ip, int port, PrintStream out, int handlerTimeout,int msgLimit) {
         this.ip = ip;
         this.sysout= (out);
         this.port = port;
@@ -41,6 +42,7 @@ public class TCPServer implements Runnable{
             put("3",new Message("Definitely not peer","I'm not a peer"));
         }};
         this.locks = new ReentrantReadWriteLock();
+        this.msgLimit = msgLimit;
     }
 
 

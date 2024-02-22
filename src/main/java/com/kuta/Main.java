@@ -46,11 +46,11 @@ public class Main {
             LogWriter.Init(config);
 
             new Thread(new UDPServer(running,picked,9876,System.out,config.peerId,config.broadcastFrequency,config.defaultTimeout)).start();
-            new Thread(new TCPServer(running,picked, 9876, System.out,30_000)).start();
+            new Thread(new TCPServer(running,picked, 9876, System.out,config.tcpTimeout,config.tcpMsgLimit)).start();
             UDPClient client = new UDPClient(picked);
 
-            String answer= "A: {\"status\":\"ok\",\"peer_id\":\"molic-peer1\"}";
-            String question = "Q: {\"command\":\"hello\",\"peer_id\":\"molic-peer1\"}";
+            String answer= "A: {\"status\":\"ok\",\"peer_id\":\"peer\"}";
+            String question = "Q: {\"command\":\"hello\",\"peer_id\":\"peer\"}";
             while(running){
                 String input = in.nextLine();
                 if(input.equals("a")){

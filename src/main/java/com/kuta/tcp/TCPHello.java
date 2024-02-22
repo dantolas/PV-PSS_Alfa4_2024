@@ -7,9 +7,9 @@ import com.google.gson.annotations.SerializedName;
  */
 public class TCPHello {
     @SerializedName("command")
-    private String command;
+    public String command;
     @SerializedName("peer_id")
-    private String peerId;
+    public String peerId;
 
     public TCPHello(String command, String peerId) {
         this.command = command;

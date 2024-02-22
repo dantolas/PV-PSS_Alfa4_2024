@@ -19,6 +19,8 @@ public class Config {
     public int defaultTimeout;
     @SerializedName("default_tcp_timeout_milis")
     public int tcpTimeout;
+    @SerializedName("msg_limit_minute")
+    public int tcpMsgLimit;
 
     public Config() {
     }
