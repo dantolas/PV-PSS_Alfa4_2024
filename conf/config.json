@@ -1,5 +1,6 @@
 {
     "peer_id":"kuta",
     "default_timeout_milis":5000,
-    "broadcast_frequency_milis":5000
+    "broadcast_frequency_milis":5000,
+    "default_tcp_timeout_milis":5000
 }

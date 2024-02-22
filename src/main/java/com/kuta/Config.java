@@ -17,6 +17,8 @@ public class Config {
     public String peerId;
     @SerializedName("default_timeout_milis")
     public int defaultTimeout;
+    @SerializedName("default_tcp_timeout_milis")
+    public int tcpTimeout;
 
     public Config() {
     }

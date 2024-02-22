@@ -4,12 +4,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import com.kuta.util.color.ColorMe;
 import com.kuta.vendor.GsonParser;
@@ -42,14 +39,14 @@ public class TCPHandler implements Runnable{
     }
 
     private void handleHello(String msg){
-
-        TCPHello question = GsonParser.parser.fromJson(msg,TCPHello.class);
-        if(!question.isValid()) return;
+        TCPHello introduction = GsonParser.parser.fromJson(msg,TCPHello.class);
+        if(!introduction.isValid()) return;
         readLock.lock();
         HashMap<String,Message> msgHistory = server.msgHistory;
         TCPAnswer answer = new TCPAnswer("ok",msgHistory);
         String jsonAnswer = GsonParser.parser.toJson(answer);
-        server.sysout.println(TCPh+"|Answer:"+jsonAnswer);
+        server.sysout.println(TCPh+"|Sending answer");
+        out.println(jsonAnswer);
         readLock.unlock();
     }
 
@@ -71,13 +68,14 @@ public class TCPHandler implements Runnable{
 
     public void handle(String msg){
         try {
+            server.sysout.println(TCPh+"|Trying hello");
             handleHello(msg);
         } catch (Exception e) {
         }
         try{
+            server.sysout.println(TCPh+"|Trying new message");
             handleNewMessage(msg);
         } catch(Exception e){
-
         }
     }
 
@@ -93,22 +91,39 @@ public class TCPHandler implements Runnable{
     }
     public void tearDown(){
         server.sysout.println(TCPh+"|Shutting down|");
-        in.close();
-        out.close();
     }
 
+    private void checkTimeout(long timePassed) throws TimeoutException{
+        if(timePassed > timeout) throw new TimeoutException("Connection timed out");
+    };
+    private String readResponse() throws TimeoutException{
+        String resp = null;
+        long timeStartedWaiting = System.currentTimeMillis();
+        while(resp == null){
+            long waitingTime = System.currentTimeMillis() - timeStartedWaiting;
+            checkTimeout(waitingTime);
+            try {
+                resp = in.nextLine();
 
+            } catch (Exception e) {
+            }
+        }
+        return resp;
+    }
     @Override
     public void run() {
         try {
             setup();
             while(true){
-                String msg = this.in.nextLine();
+                server.sysout.println(TCPh+"|Waiting for msg");
+                String msg = readResponse();
+                server.sysout.println(TCPh+"|Msg received:"+msg);
                 handle(msg);
-
-                break;
             }
-        } catch (Exception e) {
+        } catch (TimeoutException e) {
+            server.sysout.println(TCPh+"|Connection timed out");
+        } catch(Exception e){
+            e.printStackTrace();
         }
         finally{
             tearDown();

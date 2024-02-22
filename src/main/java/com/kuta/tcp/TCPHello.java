@@ -11,6 +11,11 @@ public class TCPHello {
     @SerializedName("peer_id")
     private String peerId;
 
+    public TCPHello(String command, String peerId) {
+        this.command = command;
+        this.peerId = peerId;
+    }
+
     public boolean isValid(){
         return command!=null&&peerId!=null;
     }

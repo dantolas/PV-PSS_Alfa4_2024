@@ -2,14 +2,10 @@ package com.kuta.tcp;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.net.InterfaceAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -39,7 +35,11 @@ public class TCPServer implements Runnable{
         this.sysout= (out);
         this.port = port;
         this.HANDLER_TIMEOUT = handlerTimeout;
-        this.msgHistory = new HashMap<>();
+        this.msgHistory = new HashMap<>(){{
+            put("1",new Message("peer123","I'm a femboy"));
+            put("2",new Message("I'm peer","I'm a peer"));
+            put("3",new Message("Definitely not peer","I'm not a peer"));
+        }};
         this.locks = new ReentrantReadWriteLock();
     }
 

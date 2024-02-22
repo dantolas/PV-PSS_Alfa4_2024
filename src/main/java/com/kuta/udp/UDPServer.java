@@ -67,13 +67,16 @@ public class UDPServer implements Runnable{
     private void handleAnswer(UDPAnswer answer, DatagramPacket p) throws IOException{
         out.println(UDP+"|Answer received");
         if(!answer.status.equalsIgnoreCase("ok")) return;
-        if(knownPeers.containsKey(p.getSocketAddress())) return;
+        if(knownPeers.containsKey(p.getSocketAddress())){
+            out.println(UDP+"|"+ColorMe.green(knownPeers.get(p.getSocketAddress()))+" already known");
+            return;
+        }
 
         knownPeers.put(p.getSocketAddress(),answer.peerId);
         out.println(UDP+"|Added peer:"+ColorMe.green(answer.peerId)+"@"+ColorMe.green(p.getSocketAddress().toString()));
-        p = newPacket(p.getAddress(),p.getPort(),UDP+"|Answer fine,will attempt TCP conn to "+answer.peerId);
+        p = newPacket(p.getAddress(),p.getPort(),UDP+"|Answer fine,will attempt TCP conn to "+ColorMe.green(answer.peerId));
         socket.send(p);
-        new Thread(new TCPClient(p.getAddress(),9876,answer.peerId,out)).start();
+        new Thread(new TCPClient(p.getAddress(),9876,answer.peerId,PEER_ID,out)).start();
         return;
     }
 
@@ -98,6 +101,8 @@ public class UDPServer implements Runnable{
             if(answer.isValid()) {handleAnswer(answer,p); return;}
         } catch (Exception e) {
         }
+        p = newPacket(p.getAddress(),p.getPort(),":]");
+        socket.send(p);
         return;
     }
     
@@ -143,7 +148,6 @@ public class UDPServer implements Runnable{
 
             while (running) {
                 long timeSinceBS = (System.currentTimeMillis()-lastBSTime);
-                out.println(UDP+"Time since broadcast"+timeSinceBS);
                 if(timeSinceBS >= BROADCAST_TIMER){
                     lastBSTime = System.currentTimeMillis();
                     out.println(UDP+"|SENDING BROADCAST|");
@@ -151,8 +155,7 @@ public class UDPServer implements Runnable{
                 }
                 try {
                     int timeout = Math.abs((int)(BROADCAST_TIMER - timeSinceBS));
-                    if(timeout < 0) timeout = DEFAULT_TIMEOUT;
-                    out.println(UDP+"Setting listen timeout"+timeout);
+                    if(timeout <= 0) timeout = 1;
                     socket.setSoTimeout(timeout);
                     socket.receive(packet);
                     handlePacket(packet);
