@@ -3,7 +3,7 @@ package com.kuta.tcp;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * TCPQuestion
+ * Class used for JSON serialization of the TCP Hello command
  */
 public class TCPHello {
     @SerializedName("command")

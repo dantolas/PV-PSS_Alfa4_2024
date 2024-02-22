@@ -141,7 +141,7 @@ public class TCPHandler implements Runnable{
     public void run() {
         try {
             setup();
-            while(true){
+            while(server.running){
                 checkSpam();
                 server.sysout.println(TCPh+"|Waiting for msg");
                 String msg = readResponse();

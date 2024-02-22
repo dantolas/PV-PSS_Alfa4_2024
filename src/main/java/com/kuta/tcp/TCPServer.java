@@ -12,7 +12,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import com.kuta.util.color.ColorMe;
 
 /**
- * TCPSocket
+ * TCP Server running on specified network socket.
+ * Responsible for receiving TCP connections, and sending out TCP clients to specified sockets
+ * 
+ * Implements Runnable interface to be run as a Thread
+ * To run the server either create a new Thread and start it or just call the run() method
+ *
  */
 public class TCPServer implements Runnable{
 
@@ -20,7 +25,7 @@ public class TCPServer implements Runnable{
     private int port;
     private ServerSocket server;
     private Socket peer;
-    private boolean running;
+    public boolean running;
     private final int HANDLER_TIMEOUT;
 
     public PrintStream sysout;
@@ -31,6 +36,16 @@ public class TCPServer implements Runnable{
     public ReadWriteLock locks;
     public int msgLimit;
 
+    /**
+     * Main constructor for creating a new TCPServer
+     * 
+     * @param running Indicates whether the server and all clients should be running
+     * @param ip IPv4 address to bind to
+     * @param port Network port to bind to
+     * @param out OutputStream to print useful information
+     * @param handlerTimeout Timeout for receiving TCP packets
+     * @param msgLimit Msg limit per minute for every TCP Client trying to send information to server
+     */
     public TCPServer(boolean running,InterfaceAddress ip, int port, PrintStream out, int handlerTimeout,int msgLimit) {
         this.ip = ip;
         this.sysout= (out);
@@ -46,12 +61,19 @@ public class TCPServer implements Runnable{
     }
 
 
+    /**
+     * Should be used on server startup, sets up necessary things for server to run
+     */
     public void setup(){
         sysout.println(TCP+"|STARTING TCP SERVER|");
-        sysout.println(TCP+"|TCP SERVER LISTENING ON "+ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
+        sysout.println(TCP+"|TCP SERVER LISTENING ON "
+            +ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
         running = true;
     }
 
+    /**
+     * Relases all resources and shuts down the server
+     */
     public void tearDown(){
         sysout.println(TCP+"|TCP SERVER TEARING DOWN|");
         try {

@@ -3,14 +3,14 @@ package com.kuta.udp;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 /**
- * UDPClient
+ * Mainly used for testing purposed, 
+ * can be used to send UDP packets to specified UDP socket listening
  */
 public class UDPClient {
 

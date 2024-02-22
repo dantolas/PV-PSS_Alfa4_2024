@@ -9,7 +9,12 @@ import com.kuta.util.log.LogWriter;
 import com.kuta.util.log.LogWriterInitException;
 
 /**
- * errorHandler
+ * Used for error handling and writing logs of exceptions during runtime.
+ * Isn't used everywhere in the program, mainly used in the Main method to catch runtime errors
+ * and inform the user.
+ *
+ * Handling is achieved by using a specific handle() method with the specific Exception
+ * for different implementation
  */
 public class ErrorHandler {
 

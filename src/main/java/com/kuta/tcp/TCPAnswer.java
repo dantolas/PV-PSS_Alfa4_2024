@@ -5,7 +5,7 @@ import java.util.HashMap;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * TCPAnswer
+ * Class used for JSON serialization of the TCP Answer command
  */
 public class TCPAnswer {
 

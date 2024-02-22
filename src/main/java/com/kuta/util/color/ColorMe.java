@@ -2,6 +2,8 @@ package com.kuta.util.color;
 
 /**
  * ColorMe
+ * Utility to color console output using ANSI escape codes.
+ * Methods return the given String colored by surrounding it with the appropriate ANSI escape codes.
  */
 public abstract class ColorMe {
 

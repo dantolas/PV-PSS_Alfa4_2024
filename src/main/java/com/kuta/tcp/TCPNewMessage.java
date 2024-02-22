@@ -3,7 +3,7 @@ package com.kuta.tcp;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * TCPNewMessage
+ * Class used for creating and JSON serialization of new messages to be sent through TCP
  */
 public class TCPNewMessage {
     @SerializedName("command")

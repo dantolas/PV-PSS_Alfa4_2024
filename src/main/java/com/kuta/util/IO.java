@@ -12,9 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * IO
+ * Used to statically provide functionality for working with the file system
  */
-public class IO {
+public abstract class IO {
 
     private static BufferedReader reader;
     private static BufferedWriter writer;

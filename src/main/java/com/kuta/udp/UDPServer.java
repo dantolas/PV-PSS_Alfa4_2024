@@ -17,7 +17,11 @@ import com.kuta.util.color.ColorMe;
 import com.kuta.vendor.GsonParser;
 
 /**
- * UDPServer
+ * UDP Server running on specified network socket.
+ * Responsible for broadcasting information, and handling UDP responses from other machines.
+ *
+ * Implements Runnable interface to be run as a Thread
+ * To run the server either create a new Thread and start it or just call the run() method
  */
 public class UDPServer implements Runnable{
 
@@ -39,6 +43,18 @@ public class UDPServer implements Runnable{
     public final Gson GSON; 
     private HashMap<SocketAddress,String> knownPeers;
 
+    /**
+     * Main constructor for creating the UDPServer
+     *
+     * @param running Indicates whether the server is should be running
+     * @param ip IPv4 to bind to
+     * @param port Network port to bind to
+     * @param outStream Output stream for printing information
+     * @param peerId Server identification
+     * @param broadcastTimer Milisecond interval to send UDP broadcasts
+     * @param defaultTimeout Default timeout for sending and receiving packets
+     * @throws SocketException
+     */
     public UDPServer(boolean running,InterfaceAddress ip,int port,PrintStream outStream,String peerId,int broadcastTimer,int defaultTimeout) throws SocketException {
         knownPeers = new HashMap<>();
         this.out = outStream;
@@ -51,11 +67,21 @@ public class UDPServer implements Runnable{
         GSON = GsonParser.parser;
     }
 
+    /**
+     * Broadcasts a hello message to the network broadcast address
+     * @throws IOException If socket gets interrupted
+     */
     private void broadcastHello() throws IOException{
         DatagramPacket helloPacket = newPacket(ip.getBroadcast(),port,"{\"command\":\"hello\",\"peer_id\":\""+PEER_ID+"\"}");
         socket.send(helloPacket);
     }
 
+    /**
+     * Handles a packet containing a hello message command
+     * @param question UDPQuestion object created from the inner message in packet
+     * @param p The packet received
+     * @throws IOException If socket gets interrupted
+     */
     private void handleQuestion(UDPQuestion question,DatagramPacket p) throws IOException{
             out.println(UDP+"|Question received");
             out.println(UDP+"|Sending response to:"+question.peerId);
@@ -64,6 +90,12 @@ public class UDPServer implements Runnable{
             return;
     }
 
+    /**
+     * Handles a packet containing an ok response command
+     * @param answer UDPAnswer object created from the inner message in packet
+     * @param p The packet received
+     * @throws IOException If socket gets interrupted
+     */
     private void handleAnswer(UDPAnswer answer, DatagramPacket p) throws IOException{
         out.println(UDP+"|Answer received");
         if(!answer.status.equalsIgnoreCase("ok")) return;
@@ -80,6 +112,16 @@ public class UDPServer implements Runnable{
         return;
     }
 
+    /**
+     * Handles every packet received by the server
+     * First the inner message inside the packet is extracted
+     * Second it tries to deserialize the inner message to UDPQuestion object to see if it's a 
+     * hello command
+     * Third it tries the same thing with the UDPAnswer object to see if it's a response
+     * If none match, a smiley is sent back
+     * @param p DatagramPacket received by the server
+     * @throws IOException If socket gets interrupted
+     */
     private void handlePacket(DatagramPacket p) throws IOException{
         if(p.getSocketAddress().equals(socket.getLocalSocketAddress())){
             return;
@@ -105,22 +147,41 @@ public class UDPServer implements Runnable{
         socket.send(p);
         return;
     }
-    
+
+    /**
+     * Creates a new packet ready to be sent from input parameters
+     * @param ip IPv4 to send to
+     * @param port Network port to send to
+     * @param msg Message to be sent
+     * @return DatagramPacket ready to be sent
+     */
     private DatagramPacket newPacket(InetAddress ip, int port,String msg){
         return new DatagramPacket(msg.getBytes(), msg.getBytes().length,ip,port);
     };
 
+    /**
+     * Creates a new packet containing the answer in response to a hello command
+     * @param question Packet containing the hello command
+     * @return DatagramPacket ready to be sent
+     */
     private DatagramPacket createAnswer(DatagramPacket question){
         String answerMsg = "{\"status\":\"ok\",\"peer_id\":\""+PEER_ID+"\"}";
         return new DatagramPacket(answerMsg.getBytes(),answerMsg.getBytes().length,question.getSocketAddress());
     }
 
+    /**
+     * Relases all resources and shuts down the server
+     */
     public void tearDown(){
         this.running = false;
         out.println(UDP+"|UDP SERVER TEARING DOWN|");
         socket.close();
     }
 
+    /**
+     * Should be used on server startup, sets up necessary parts to run the server
+     * @throws SocketException If socket is interrupted
+     */
     public void setup() throws SocketException{
 
         out.println(UDP+"|STARTING UDP SERVER|");

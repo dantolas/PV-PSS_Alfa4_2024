@@ -3,7 +3,7 @@ import com.google.gson.annotations.SerializedName;
 import com.kuta.Config;
 
 /**
- * Class used to serialize and deserialize all Error logs
+ * Class representing Error logs for serialization
  */
 public class ErrorLog {
 

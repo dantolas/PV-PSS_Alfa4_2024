@@ -2,6 +2,9 @@ package com.kuta.udp;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Class used for JSON serialization of UDPAnswer command
+ */
 public class UDPAnswer{
 
     @SerializedName("status")

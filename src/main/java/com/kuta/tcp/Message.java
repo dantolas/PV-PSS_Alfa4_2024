@@ -3,7 +3,7 @@ package com.kuta.tcp;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * TCPMessage
+ * Class used for storing message information
  */
 public class Message {
     @SerializedName("peer_id")

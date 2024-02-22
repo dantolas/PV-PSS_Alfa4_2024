@@ -15,7 +15,8 @@ import java.util.Scanner;
 import com.kuta.util.color.ColorMe;
 
 /**
- * NetworkPicker
+ * Used for gathering network interfaces information, and then selecting a specific
+ * interface to be used with the rest of the program
  */
 public class NetworkPicker {
 
