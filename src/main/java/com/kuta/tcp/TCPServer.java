@@ -96,10 +96,8 @@ public class TCPServer implements Runnable{
     }
 
     public void sendMessage(String recipientPeerId, String message){
-        System.out.println(TCP+"|Adding to msgs to send");
         sendLocks.writeLock().lock();
         msgsToSend.add(new String[]{recipientPeerId,message});
-        System.out.println(TCP+"|SIZE AFTER ADDING:"+msgsToSend.size());
         sendLocks.writeLock().unlock();
     }
     public static void syncMessages(TreeMap<String,Message> msgHistory,TreeMap<String,Message> syncMsgs){

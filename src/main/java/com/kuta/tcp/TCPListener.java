@@ -81,7 +81,6 @@ public class TCPListener implements Runnable{
             try {
                 resp = in.nextLine();
             } catch (Exception e) {
-                e.printStackTrace();
             }
         }
         return resp;
