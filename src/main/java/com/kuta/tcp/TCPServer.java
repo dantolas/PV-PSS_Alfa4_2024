@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -87,17 +88,25 @@ public class TCPServer implements Runnable{
 
     public void connectClient(InetAddress ip, int port,String endpointPeerId){
         outLocks.writeLock().lock();
-        this.outConnections.add(new TCPConnection(ip,port,CLIENT_TIMEOUT,endpointPeerId,this.peerId,this.sysout));
+        this.outConnections.add(
+            new TCPConnection(ip,port,CLIENT_TIMEOUT,endpointPeerId,this.peerId,this.sysout)
+            .setMsgHistory(msgHistory, historyLocks).setup()
+        );
         outLocks.writeLock().unlock();
     }
 
     public void sendMessage(String recipientPeerId, String message){
+        System.out.println(TCP+"|Adding to msgs to send");
         sendLocks.writeLock().lock();
         msgsToSend.add(new String[]{recipientPeerId,message});
+        System.out.println(TCP+"|SIZE AFTER ADDING:"+msgsToSend.size());
         sendLocks.writeLock().unlock();
     }
-    public void syncMessages(){
-
+    public static void syncMessages(TreeMap<String,Message> msgHistory,TreeMap<String,Message> syncMsgs){
+        for(Map.Entry<String,Message> entry : syncMsgs.entrySet()){
+            if(msgHistory.keySet().contains(entry.getKey())) continue;
+            msgHistory.put(entry.getKey(),entry.getValue());
+        }
     }
 
     public void printMessages(){
@@ -110,11 +119,11 @@ public class TCPServer implements Runnable{
      */
     public void setup(){
         sysout.println(TCP+"|STARTING TCP SERVER|");
+        running = true;
         TCPSender sender = new TCPSender(this.running,outConnections, outLocks, msgsToSend, sendLocks, sysout);
         new Thread(sender).start();
         sysout.println(TCP+"|TCP SERVER LISTENING ON "
             +ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
-        running = true;
     }
 
     /**

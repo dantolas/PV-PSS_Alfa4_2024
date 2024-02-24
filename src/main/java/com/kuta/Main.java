@@ -44,9 +44,9 @@ public class Main {
 
             config = Config.fromFile(wd+"/conf/config.json");
             LogWriter.Init(config);
-            TCPServer TCP = new TCPServer(running,picked, 9876,config.peerId, System.out,config.tcpClientTimeout,
+            TCPServer TCP = new TCPServer(RUNNING,picked, 9876,config.peerId, System.out,config.tcpClientTimeout,
                 config.tcpListenerTimeout,config.tcpMsgLimit);
-            UDPServer UDP = new UDPServer(running,picked,9876,System.out,config.peerId,config.broadcastFrequency,config.udpTimeout)
+            UDPServer UDP = new UDPServer(RUNNING,picked,9876,System.out,config.peerId,config.broadcastFrequency,config.udpTimeout)
             .setTCP(TCP);
 
             new Thread(UDP).start();
@@ -55,7 +55,7 @@ public class Main {
 
             String answer= "A: {\"status\":\"ok\",\"peer_id\":\"peer\"}";
             String question = "Q: {\"command\":\"hello\",\"peer_id\":\"peer\"}";
-            while(running){
+            while(RUNNING){
                 String input = in.nextLine();
                 if(input.equals("a")){
                     client.sendEcho(answer);
@@ -73,6 +73,9 @@ public class Main {
                 if(input.equals("p")){
                     TCP.printMessages();
                 }
+                if(input.equals("e")){
+                    RUNNING = false;
+                }
                 //System.out.println(client.sendEcho("Random msg :]"));
             }
 
@@ -87,7 +90,7 @@ public class Main {
         }
         finally{
             System.out.println(ColorMe.red("Program shutting down"));
-            running = false;
+            RUNNING = false;
             in.close();
         }
 

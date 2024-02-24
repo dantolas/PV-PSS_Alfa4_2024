@@ -33,6 +33,7 @@ public class TCPSender implements Runnable{
     }
 
     private void sendMessage(String[] recipientAndMsg){
+        System.out.println(TCPs+"| RECEIVED SEND EVENT");
         String recipientPeerId = recipientAndMsg[0];
         String msg = recipientAndMsg[1];
         if(recipientPeerId.equalsIgnoreCase("all")){
@@ -68,14 +69,20 @@ public class TCPSender implements Runnable{
     }
 
     public void tearDown(){
-
+        sysout.println(TCPs+"|Ending TCP Sender");
     }
 
     @Override
     public void run() {
         setup();
         while(running){
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+            }
+            System.out.println(TCPs+"|"+msgsToSend.size());
             checkMsgsToSend();
         }
+        tearDown();
     }
 }

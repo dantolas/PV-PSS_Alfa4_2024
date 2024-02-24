@@ -31,25 +31,19 @@ public class TCPClient implements Runnable{
     private InetAddress ip;
     private int port;
     private MsgLock lock;
+    private TCPConnection connection;
 
-    /**
-     * Main constructor for instantiating a TCPClient. 
-     *
-     * @param ip IPv4 to connect to
-     * @param port Port number to connect to
-     * @param endpointPeerId Peer id of the endpoint connection
-     * @param myPeerId Peer id of the server
-     * @param sysout System.out for printing info
-     */
-    public TCPClient(InetAddress ip, int port,int timeout,String endpointPeerId,String myPeerId, PrintStream sysout, String msg,MsgLock lock) {
-        this.sysout = (sysout);
-        this.timeout = timeout;
-        this.ip = ip;
-        this.port = port;
-        this.endpointPeerId = endpointPeerId;
+
+    public TCPClient(TCPConnection connection){
+        this.sysout = connection.sysout;
+        this.timeout = connection.timeout;
+        this.ip = connection.ip;
+        this.port = connection.port;
+        this.endpointPeerId = connection.endpointPeerId;
         this.TCPc = ColorMe.yellow("TCPc-"+endpointPeerId);
-        this.HELLO = GsonParser.parser.toJson(new HelloTCP("hello",myPeerId));
-        this.lock = lock;
+        this.HELLO = GsonParser.parser.toJson(new HelloTCP("hello",connection.serverPeerId));
+        this.lock = connection.lock;
+        this.connection = connection;
     }
 
     public void setup() {
@@ -110,11 +104,12 @@ public class TCPClient implements Runnable{
                 response = send(HELLO);
                 AnswerTCP answer = GsonParser.parser.fromJson(response,AnswerTCP.class);
                 if(answer.isValid()){
-                    sysout.println(TCPc+"Was valid");
+                    sysout.println(TCPc+"|Syncinc message histories");
+                    connection.historyLocks.writeLock().lock();
+                    TCPServer.syncMessages(connection.msgHistory,answer.messages);
+                    connection.historyLocks.writeLock().unlock();
                 }
-                sysout.println(TCPc+"Was not valid");
             } catch (Exception e) {
-                sysout.println(TCPc+"Was not valid exc");
             }
             while(running){
                 synchronized(lock){
