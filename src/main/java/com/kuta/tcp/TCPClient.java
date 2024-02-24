@@ -97,6 +97,14 @@ public class TCPClient implements Runnable{
         if(out == null) return "";
         out.println(txt);
         String resp = readResponse();
+        try {
+            AnswerTCP answer = GsonParser.parser.fromJson(resp,AnswerTCP.class);
+            if(answer.status.equalsIgnoreCase("ok")){
+                connection.historyLocks.writeLock().lock();
+                connection.historyLocks.writeLock().unlock();
+            }
+        } catch (Exception e) {
+        }
         return resp;
     }
     @Override
