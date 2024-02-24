@@ -62,7 +62,6 @@ public class TCPSender implements Runnable{
             sendLocks.readLock().unlock();
             return;
         }
-        System.out.println(msgsToSend.size());
         sendMessage(msgsToSend.poll());
         sendLocks.readLock().unlock();
     }

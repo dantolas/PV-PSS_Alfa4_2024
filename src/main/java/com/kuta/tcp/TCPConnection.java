@@ -48,7 +48,6 @@ public class TCPConnection {
     }
 
     public void sendMessage(String message){
-        System.out.println("SEND MESSAGE TRIGGERED");
         synchronized(this.lock){
             this.lock.msg = message;
             lock.notify();

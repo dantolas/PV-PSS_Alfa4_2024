@@ -55,7 +55,8 @@ public class TCPClient implements Runnable{
             sysout.println(TCPc+"|Connection established");
             running = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            sysout.println(TCPc+"|Couldn't establish connection with "
+                +ColorMe.green(endpointPeerId)+ip+":"+port);
         }
     }
 
