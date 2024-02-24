@@ -14,6 +14,8 @@ import com.kuta.util.log.LogWriter;
 import com.kuta.util.log.LogWriterInitException;
 
 public class Main {
+    static volatile boolean RUNNING = true;
+
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         Config config = null;
@@ -27,7 +29,6 @@ public class Main {
         }
         ErrorHandler handler = new ErrorHandler(System.out);
 
-        boolean running = true;
         try {
             System.out.println("Checking network interfaces...");
             NetworkPicker picker = new NetworkPicker(System.out,System.in);
@@ -65,7 +66,12 @@ public class Main {
                     continue;
                 }
                 if(input.equals("m")){
-                    TCP.sendMessage("molic-peer1","IT'S ALIVE, IT'S ALIVEEE");
+                    System.out.println("Enter the message:");
+                    String message = in.nextLine();
+                    TCP.sendMessage("all",message);
+                }
+                if(input.equals("p")){
+                    TCP.printMessages();
                 }
                 //System.out.println(client.sendEcho("Random msg :]"));
             }

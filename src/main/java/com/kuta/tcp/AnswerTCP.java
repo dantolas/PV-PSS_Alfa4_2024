@@ -1,6 +1,6 @@
 package com.kuta.tcp;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -12,9 +12,9 @@ public class AnswerTCP {
     @SerializedName("status")
     public String status;
     @SerializedName("messages")
-    public HashMap<String,Message> messages;
+    public TreeMap<String,Message> messages;
 
-    public AnswerTCP(String status, HashMap<String, Message> messages) {
+    public AnswerTCP(String status, TreeMap<String, Message> messages) {
         this.status = status;
         this.messages = messages;
     }

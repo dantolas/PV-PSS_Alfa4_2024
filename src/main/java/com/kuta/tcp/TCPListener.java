@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.TreeMap;
 import java.util.concurrent.locks.Lock;
 
 import com.kuta.util.color.ColorMe;
@@ -89,7 +90,7 @@ public class TCPListener implements Runnable{
         HelloTCP introduction = GsonParser.parser.fromJson(msg,HelloTCP.class);
         if(!introduction.isValid()) return;
         readLock.lock();
-        HashMap<String,Message> msgHistory = server.msgHistory;
+        TreeMap<String,Message> msgHistory = server.msgHistory;
         AnswerTCP answer = new AnswerTCP("ok",msgHistory);
         String jsonAnswer = GsonParser.parser.toJson(answer);
         this.peerId = introduction.peerId;
@@ -110,6 +111,7 @@ public class TCPListener implements Runnable{
         writeLock.lock();
         server.sysout.println(TCPh+"|Adding new msg");
         server.msgHistory.put(newMsg.msgId,new Message(peerId,newMsg.msg));
+        server.sysout.println(server.msgHistory);
         writeLock.unlock();
         msgsLastMinute++;
         response = "{\"status\":\"ok\"}";

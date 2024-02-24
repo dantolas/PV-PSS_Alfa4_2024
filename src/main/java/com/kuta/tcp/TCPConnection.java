@@ -2,6 +2,7 @@ package com.kuta.tcp;
 
 import java.io.PrintStream;
 import java.net.InetAddress;
+import java.util.TreeMap;
 
 
 /**
@@ -22,7 +23,9 @@ public class TCPConnection {
     public volatile String message;
     public MsgLock lock;
 
-    public TCPConnection(InetAddress ip, int port,int timeout, String endpointPeerId,String serverPeerId,PrintStream sysout) {
+    public TCPConnection(InetAddress ip, int port
+        ,int timeout, String endpointPeerId,String serverPeerId,PrintStream sysout) {
+
         this.endpointPeerId = endpointPeerId;
         lock = new MsgLock();
         this.client = new TCPClient(ip, port,timeout, endpointPeerId, serverPeerId, sysout, message,lock);

@@ -19,10 +19,11 @@ public class TCPSender implements Runnable{
     public ReadWriteLock outLocks;
     public Queue<String[]> msgsToSend;
     public ReadWriteLock sendLocks;
+    private boolean running;
 
-    public TCPSender(List<TCPConnection> outConnections,ReadWriteLock outLocks, Queue<String[]> msgsToSend,
+    public TCPSender(boolean running,List<TCPConnection> outConnections,ReadWriteLock outLocks, Queue<String[]> msgsToSend,
         ReadWriteLock sendLocks, PrintStream sysout) {
-
+        this.running = running;
         this.outConnections = outConnections;
         this.outLocks = outLocks;
         this.msgsToSend = msgsToSend;
@@ -73,11 +74,7 @@ public class TCPSender implements Runnable{
     @Override
     public void run() {
         setup();
-        while(true){
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-            }
+        while(running){
             checkMsgsToSend();
         }
     }

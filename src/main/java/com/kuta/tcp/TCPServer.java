@@ -7,11 +7,12 @@ import java.net.InterfaceAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -44,7 +45,7 @@ public class TCPServer implements Runnable{
 
     public PrintStream sysout;
 
-    public HashMap<String,Message> msgHistory;
+    public TreeMap<String,Message> msgHistory;
     public ReadWriteLock historyLocks;
     public int receiveMsgLimit;
 
@@ -71,7 +72,7 @@ public class TCPServer implements Runnable{
         this.port = port;
         this.LISTENER_TIMEOUT = listenerTimeout;
         this.CLIENT_TIMEOUT = clientTimeout;
-        this.msgHistory = new HashMap<>(){{
+        this.msgHistory = new TreeMap<>((id1,id2)-> Long.compare(Long.parseLong(id1),Long.parseLong(id2))){{
             put("1",new Message("peer123","I'm a femboy"));
             put("2",new Message("I'm peer","I'm a peer"));
             put("3",new Message("Definitely not peer","I'm not a peer"));
@@ -95,15 +96,21 @@ public class TCPServer implements Runnable{
         msgsToSend.add(new String[]{recipientPeerId,message});
         sendLocks.writeLock().unlock();
     }
+    public void syncMessages(){
 
+    }
 
-
+    public void printMessages(){
+        historyLocks.readLock().lock();
+        sysout.println(msgHistory);
+        historyLocks.readLock().unlock();
+    }
     /**
      * Should be used on server startup, sets up necessary things for server to run
      */
     public void setup(){
         sysout.println(TCP+"|STARTING TCP SERVER|");
-        TCPSender sender = new TCPSender(outConnections, outLocks, msgsToSend, sendLocks, sysout);
+        TCPSender sender = new TCPSender(this.running,outConnections, outLocks, msgsToSend, sendLocks, sysout);
         new Thread(sender).start();
         sysout.println(TCP+"|TCP SERVER LISTENING ON "
             +ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
@@ -135,7 +142,6 @@ public class TCPServer implements Runnable{
                 peer = server.accept();
                 sysout.println(TCP+"|Handing peer to handler:"+ColorMe.green(peer.getInetAddress().toString()+":"+peer.getPort()));
                 new Thread(new TCPListener(this,peer,LISTENER_TIMEOUT)).start();
-                //new Thread(new TCPHandler(this,new Socket(peer.getInetAddress(),peer.getPort()))).start();
             }
         } catch (IOException e) {
             sysout.println(TCP+ColorMe.red("|Error occured on server"));

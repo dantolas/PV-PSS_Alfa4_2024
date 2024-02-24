@@ -7,12 +7,16 @@ import com.google.gson.annotations.SerializedName;
  */
 public class Message {
     @SerializedName("peer_id")
-    public String peer_id;
+    public String peerId;
     @SerializedName("message")
     public String message;
-    public Message(String peer_id, String message) {
-        this.peer_id = peer_id;
+    public Message(String peerId, String message) {
+        this.peerId = peerId;
         this.message = message;
+    }
+    @Override
+    public String toString() {
+        return peerId+":"+message;
     }
 
 }
