@@ -13,10 +13,10 @@ import com.kuta.vendor.GsonParser;
 
 /**
  * Class responsible for handling TCP connections to the server, receives messages and responds.
- * Does not send messages itself
+ * Does not send messages, only responds.
  * Runs as a thread
  * */
-public class TCPHandler implements Runnable{
+public class TCPListener implements Runnable{
 
     private TCPServer server;
     private Socket peer;
@@ -29,12 +29,11 @@ public class TCPHandler implements Runnable{
     private int msgsLastMinute;
     private long stopwatch;
 
-
     private final Lock readLock;
     private final Lock writeLock;
 
 
-    private final String TCPh = ColorMe.yellow("TCPh-"+ID);
+    private final String TCPh = ColorMe.yellow("TCPl-"+ID);
 
     /**
      * Main constructor for handler.
@@ -42,13 +41,13 @@ public class TCPHandler implements Runnable{
      * @param peer The socket conn to be handled
      * @param timeout
      */
-    public TCPHandler(TCPServer server, Socket peer, int timeout) {
+    public TCPListener(TCPServer server, Socket peer, int timeout) {
         this.server = server;
         this.peer = peer;
         this.timeout = timeout;
-        this.readLock = server.locks.readLock();
-        this.writeLock = server.locks.writeLock();
-        this.msgLimit = server.msgLimit;
+        this.readLock = server.historyLocks.readLock();
+        this.writeLock = server.historyLocks.writeLock();
+        this.msgLimit = server.receiveMsgLimit;
     }
 
     private void checkTimeout(long timePassed) throws TimeoutException{
@@ -87,11 +86,11 @@ public class TCPHandler implements Runnable{
         return resp;
     }
     private void handleHello(String msg){
-        TCPHello introduction = GsonParser.parser.fromJson(msg,TCPHello.class);
+        HelloTCP introduction = GsonParser.parser.fromJson(msg,HelloTCP.class);
         if(!introduction.isValid()) return;
         readLock.lock();
         HashMap<String,Message> msgHistory = server.msgHistory;
-        TCPAnswer answer = new TCPAnswer("ok",msgHistory);
+        AnswerTCP answer = new AnswerTCP("ok",msgHistory);
         String jsonAnswer = GsonParser.parser.toJson(answer);
         this.peerId = introduction.peerId;
         out.println(jsonAnswer);
@@ -99,7 +98,7 @@ public class TCPHandler implements Runnable{
     }
 
     private void handleNewMessage(String msg){
-        TCPNewMessage newMsg = GsonParser.parser.fromJson(msg,TCPNewMessage.class);
+        NewTCPMessage newMsg = GsonParser.parser.fromJson(msg,NewTCPMessage.class);
         if(!newMsg.isValid()) return;
 
         String response = "{\"status\":\"bad\",\"reason\":\"Have some manners and introduce yourself first\"}";
@@ -151,7 +150,7 @@ public class TCPHandler implements Runnable{
             setup();
             while(server.running){
                 checkSpam();
-                server.sysout.println(TCPh+"|Waiting for msg");
+                server.sysout.println(TCPh+"|Listening for msg");
                 String msg = readResponse();
                 server.sysout.println(TCPh+"|Msg received:"+msg);
                 handle(msg);

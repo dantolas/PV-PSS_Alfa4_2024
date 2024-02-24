@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Class used for creating and JSON serialization of new messages to be sent through TCP
  */
-public class TCPNewMessage {
+public class NewTCPMessage {
     @SerializedName("command")
     public String command;
     @SerializedName("message_id")
@@ -13,7 +13,7 @@ public class TCPNewMessage {
     @SerializedName("message")
     public String msg;
 
-    public TCPNewMessage(String command, String msgId, String msg) {
+    public NewTCPMessage(String command, String msgId, String msg) {
         this.command = command;
         this.msgId = msgId;
         this.msg = msg;

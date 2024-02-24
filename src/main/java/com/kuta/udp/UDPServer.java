@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.kuta.tcp.TCPClient;
+import com.kuta.tcp.TCPServer;
 import com.kuta.util.color.ColorMe;
 import com.kuta.vendor.GsonParser;
 
@@ -29,7 +30,7 @@ public class UDPServer implements Runnable{
     private int port;
     private InterfaceAddress ip;
     private DatagramSocket socket;
-
+    private TCPServer TCP;
 
     private boolean running;
     private PrintStream out;
@@ -65,6 +66,11 @@ public class UDPServer implements Runnable{
         this.DEFAULT_TIMEOUT = defaultTimeout;
         this.socket = new DatagramSocket(port,ip.getAddress());
         GSON = GsonParser.parser;
+    }
+
+    public UDPServer setTCP(TCPServer TCP){
+        this.TCP = TCP;
+        return this;
     }
 
     /**
@@ -108,7 +114,7 @@ public class UDPServer implements Runnable{
         out.println(UDP+"|Added peer:"+ColorMe.green(answer.peerId)+"@"+ColorMe.green(p.getSocketAddress().toString()));
         p = newPacket(p.getAddress(),p.getPort(),UDP+"|Answer fine,will attempt TCP conn to "+ColorMe.green(answer.peerId));
         socket.send(p);
-        new Thread(new TCPClient(p.getAddress(),9876,answer.peerId,PEER_ID,out)).start();
+        TCP.connectClient(p.getAddress(),9876,answer.peerId);
         return;
     }
 
@@ -128,8 +134,6 @@ public class UDPServer implements Runnable{
         }
 
         String msgRec = new String(p.getData(), 0, p.getLength());
-
-        out.println(UDP+"|Received this message:"+msgRec);
 
         String content = msgRec.replaceFirst(MSG_SPLIT_REGEX,"");
 

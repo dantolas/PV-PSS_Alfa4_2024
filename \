@@ -7,7 +7,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Scanner;
 
-import com.kuta.tcp.TCPConnection.MsgLock;
 import com.kuta.util.color.ColorMe;
 import com.kuta.vendor.GsonParser;
 
@@ -30,7 +29,8 @@ public class TCPClient implements Runnable{
 
     private InetAddress ip;
     private int port;
-    private MsgLock lock;
+    private volatile boolean sendNow;
+    private String msg;
 
     /**
      * Main constructor for instantiating a TCPClient. 
@@ -41,14 +41,15 @@ public class TCPClient implements Runnable{
      * @param myPeerId Peer id of the server
      * @param sysout System.out for printing info
      */
-    public TCPClient(InetAddress ip, int port,String endpointPeerId,String myPeerId, PrintStream sysout, String msg,MsgLock lock) {
+    public TCPClient(InetAddress ip, int port,String endpointPeerId,String myPeerId, PrintStream sysout, boolean sendNow, String msg) {
         this.sysout = (sysout);
         this.ip = ip;
         this.port = port;
         this.endpointPeerId = endpointPeerId;
         this.TCPc = ColorMe.yellow("TCPc-"+endpointPeerId);
         this.HELLO = GsonParser.parser.toJson(new HelloTCP("hello",myPeerId));
-        this.lock = lock;
+        this.sendNow = sendNow;
+        this.msg = msg;
     }
 
     public void setup() {
@@ -107,17 +108,16 @@ public class TCPClient implements Runnable{
         try {
             sysout.println(TCPc+"|"+send(HELLO));
             while(running){
-                synchronized(lock){
-                    lock.wait();
-                    String msg = lock.msg;
-                    while(msg== null){
-                        System.out.println(TCPc+"| STILL NO UPDATE");
-                        Thread.sleep(100);
-                    }
-                    String response = send(newMessage(msg));
+                synchronized(msg){
+                    msg.wait();
+                    sysout.println(TCPc+"|Sending msg");
+                    String response = send(newMessage(this.msg));
                     sysout.println(TCPc+"|"+response);
                 }
+                if(!this.sendNow) continue;
+                sysout.println(TCPc+"| sendNow = "+sendNow);
                 Thread.sleep(4000);
+                this.sendNow = false;
             }
         } catch (TimeoutException e) {
             sysout.println(TCPc+"|Connection timed out");

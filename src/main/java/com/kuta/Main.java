@@ -43,9 +43,12 @@ public class Main {
 
             config = Config.fromFile(wd+"/conf/config.json");
             LogWriter.Init(config);
+            TCPServer TCP = new TCPServer(running,picked, 9876,config.peerId, System.out,config.tcpTimeout,config.tcpMsgLimit);
+            UDPServer UDP = new UDPServer(running,picked,9876,System.out,config.peerId,config.broadcastFrequency,config.defaultTimeout)
+            .setTCP(TCP);
 
-            new Thread(new UDPServer(running,picked,9876,System.out,config.peerId,config.broadcastFrequency,config.defaultTimeout)).start();
-            new Thread(new TCPServer(running,picked, 9876, System.out,config.tcpTimeout,config.tcpMsgLimit)).start();
+            new Thread(UDP).start();
+            new Thread(TCP).start();
             UDPClient client = new UDPClient(picked);
 
             String answer= "A: {\"status\":\"ok\",\"peer_id\":\"peer\"}";
@@ -60,7 +63,11 @@ public class Main {
                     client.sendEcho(question);
                     continue;
                 }
-                System.out.println(client.sendEcho("Random msg :]"));
+                if(input.equals("m")){
+                    System.out.println("Sending msg");
+                    TCP.sendMessage("peer","IT'S WORKING AS INTENDED");
+                }
+                //System.out.println(client.sendEcho("Random msg :]"));
             }
 
         }
