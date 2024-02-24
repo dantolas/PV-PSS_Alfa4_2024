@@ -214,9 +214,9 @@ public class UDPServer implements Runnable{
                 long timeSinceBS = (System.currentTimeMillis()-lastBSTime);
                 if(timeSinceBS >= BROADCAST_TIMER){
                     lastBSTime = System.currentTimeMillis();
-                    out.println();
+                    out.println(ColorMe.purple("=============="));
                     out.println(UDP+"|SENDING BROADCAST|");
-                    out.println();
+                    out.println(ColorMe.purple("=============="));
                     broadcastHello();
                 }
                 try {
