@@ -12,8 +12,10 @@ import com.kuta.util.color.ColorMe;
 import com.kuta.vendor.GsonParser;
 
 /**
- * TCPHandler
- */
+ * Class responsible for handling TCP connections to the server, receives messages and responds.
+ * Does not send messages itself
+ * Runs as a thread
+ * */
 public class TCPHandler implements Runnable{
 
     private TCPServer server;
@@ -34,6 +36,12 @@ public class TCPHandler implements Runnable{
 
     private final String TCPh = ColorMe.yellow("TCPh-"+ID);
 
+    /**
+     * Main constructor for handler.
+     * @param server TCPServer object that started this handler
+     * @param peer The socket conn to be handled
+     * @param timeout
+     */
     public TCPHandler(TCPServer server, Socket peer, int timeout) {
         this.server = server;
         this.peer = peer;
