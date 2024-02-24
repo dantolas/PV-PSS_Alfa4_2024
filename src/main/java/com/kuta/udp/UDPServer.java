@@ -111,8 +111,9 @@ public class UDPServer implements Runnable{
         out.print(UDP+"|Answer received");
         if(!answer.status.equalsIgnoreCase("ok")) return;
         UDPServer.lock.readLock().lock();
-        if(knownPeers.containsKey(p.getSocketAddress())){
+        if(UDPServer.knownPeers.containsKey(p.getSocketAddress())){
             out.println("|known "+ColorMe.green(knownPeers.get(p.getSocketAddress()))+" ");
+            UDPServer.lock.readLock().unlock();
             return;
         }
         UDPServer.lock.readLock().unlock();
