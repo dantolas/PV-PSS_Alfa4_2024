@@ -10,6 +10,9 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.google.gson.Gson;
 import com.kuta.tcp.TCPServer;
@@ -41,7 +44,8 @@ public class UDPServer implements Runnable{
     private final String PEER_ID;
     private final String MSG_SPLIT_REGEX = "^\\s*(\\w)\\s*[:;,-_=]*\\s*";
     public final Gson GSON; 
-    private HashMap<SocketAddress,String> knownPeers;
+    public static HashMap<SocketAddress,String> knownPeers;
+    public static ReadWriteLock lock;
 
     /**
      * Main constructor for creating the UDPServer
@@ -56,7 +60,8 @@ public class UDPServer implements Runnable{
      * @throws SocketException
      */
     public UDPServer(boolean running,InterfaceAddress ip,int port,PrintStream outStream,String peerId,int broadcastTimer,int defaultTimeout) throws SocketException {
-        knownPeers = new HashMap<>();
+        UDPServer.knownPeers = new HashMap<>();
+        UDPServer.lock = new ReentrantReadWriteLock();
         this.out = outStream;
         this.port = port;
         this.ip = ip;
@@ -88,8 +93,8 @@ public class UDPServer implements Runnable{
      * @throws IOException If socket gets interrupted
      */
     private void handleQuestion(UDPQuestion question,DatagramPacket p) throws IOException{
-        out.println(UDP+"|Question received");
-        out.print("|Sending response to:"+question.peerId);
+        out.print(UDP+"|Question received");
+        out.println("|Sending response to:"+ColorMe.green(question.peerId));
         out.println();
         p = createAnswer(p);
         socket.send(p);
@@ -105,12 +110,17 @@ public class UDPServer implements Runnable{
     private void handleAnswer(UDPAnswer answer, DatagramPacket p) throws IOException{
         out.print(UDP+"|Answer received");
         if(!answer.status.equalsIgnoreCase("ok")) return;
+        UDPServer.lock.readLock().lock();
         if(knownPeers.containsKey(p.getSocketAddress())){
             out.println("|known "+ColorMe.green(knownPeers.get(p.getSocketAddress()))+" ");
             return;
         }
+        UDPServer.lock.readLock().unlock();
 
+
+        UDPServer.lock.writeLock().lock();
         knownPeers.put(p.getSocketAddress(),answer.peerId);
+        UDPServer.lock.writeLock().unlock();
         out.println("|Added peer:"+ColorMe.green(answer.peerId)+"@"+ColorMe.green(p.getSocketAddress().toString()));
         p = newPacket(p.getAddress(),p.getPort(),UDP+"|Answer fine,will attempt TCP conn to "+ColorMe.green(answer.peerId));
         socket.send(p);

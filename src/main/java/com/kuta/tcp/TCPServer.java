@@ -90,7 +90,9 @@ public class TCPServer implements Runnable{
         outLocks.writeLock().lock();
         this.outConnections.add(
             new TCPConnection(ip,port,CLIENT_TIMEOUT,endpointPeerId,this.peerId,this.sysout)
-            .setMsgHistory(msgHistory, historyLocks).setup()
+            .setMsgHistory(msgHistory, historyLocks)
+            .setSelfDeleting(outConnections,outLocks)
+            .setup()
         );
         outLocks.writeLock().unlock();
     }

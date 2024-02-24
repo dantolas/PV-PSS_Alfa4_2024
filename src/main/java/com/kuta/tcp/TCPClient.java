@@ -70,6 +70,7 @@ public class TCPClient implements Runnable{
         } catch (Exception e) {
         } 
         sysout.println(TCPc+"|Connection closed");
+        connection.end();
     }
     public NewTCPMessage newMessage(String msg){
         return new NewTCPMessage("new_message", Long.toString(System.currentTimeMillis()),msg);
