@@ -62,12 +62,11 @@ public class TCPClient implements Runnable{
 
     public void tearDown() {
         sysout.println(TCPc+"|Closing tcp connection");
-        in.close();
-        out.close();
         try {
+            in.close();
+            out.close();
             client.close();
         } catch (IOException e) {
-            e.printStackTrace();
         }
         sysout.println(TCPc+"|Connection closed");
     }
@@ -85,7 +84,11 @@ public class TCPClient implements Runnable{
         while(resp == null){
             long waitingTime = System.currentTimeMillis() - timeStartedWaiting;
             checkTimeout(waitingTime);
-            resp = in.nextLine();
+            try {
+                
+                resp = in.nextLine();
+            } catch (Exception e) {
+            }
         }
         return resp;
     }
