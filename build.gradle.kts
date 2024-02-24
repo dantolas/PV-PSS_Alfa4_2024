@@ -8,8 +8,10 @@ plugins{
     application
     java
     id ("com.github.johnrengelman.shadow") version "8.1.1"
+    id("org.springframework.boot") version "3.2.3" 
 }
 
+apply(plugin = "io.spring.dependency-management")
 
 application {
     mainClass = "com.kuta.Main"
@@ -22,7 +24,8 @@ repositories{
 }
 
 dependencies{
-        implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 }
 
 tasks {
@@ -30,19 +33,21 @@ tasks {
         manifest {
             attributes["Main-Class"] = "com.kuta.Main" 
         }
+
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Exclude duplicates
         configurations["compileClasspath"].forEach { file: File ->
         from(zipTree(file.absoluteFile))
     }
     }
-
     shadowJar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    archiveBaseName.set("alfa_4")
-    destinationDirectory.set(File("./"))
-    mergeServiceFiles()
-    manifest {
-        attributes("Main-Class" to "com.kuta.Main")
-    }
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Exclude duplicates
+        exclude("META-INF/LICENSE.txt") // Exclude the specific file causing conflict
+        archiveBaseName.set("alfa_4")
+        destinationDirectory.set(File("./"))
+        mergeServiceFiles()
+        manifest {
+            attributes("Main-Class" to "com.kuta.Main")
+        }
   }
 }
 

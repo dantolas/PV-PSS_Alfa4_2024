@@ -4,6 +4,9 @@ import java.net.InterfaceAddress;
 import java.net.SocketException;
 import java.util.Scanner;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import com.kuta.tcp.TCPServer;
 import com.kuta.udp.UDPClient;
 import com.kuta.udp.UDPServer;
@@ -13,10 +16,12 @@ import com.kuta.util.color.ColorMe;
 import com.kuta.util.log.LogWriter;
 import com.kuta.util.log.LogWriterInitException;
 
+@SpringBootApplication
 public class Main {
     static volatile boolean RUNNING = true;
 
     public static void main(String[] args) {
+        SpringApplication.run(Main.class,args);
         Scanner in = new Scanner(System.in);
         Config config = null;
         String wd = System.getProperty("user.dir");
