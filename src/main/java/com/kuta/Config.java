@@ -15,10 +15,12 @@ public class Config {
     public int broadcastFrequency;
     @SerializedName("peer_id")
     public String peerId;
-    @SerializedName("default_timeout_milis")
-    public int defaultTimeout;
-    @SerializedName("default_tcp_timeout_milis")
-    public int tcpTimeout;
+    @SerializedName("udp_timeout")
+    public int udpTimeout;
+    @SerializedName("tcp_client_timeout")
+    public int tcpClientTimeout;
+    @SerializedName("tcp_listener_timeout")
+    public int tcpListenerTimeout;
     @SerializedName("msg_limit_minute")
     public int tcpMsgLimit;
 

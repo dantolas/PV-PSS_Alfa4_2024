@@ -43,8 +43,9 @@ public class Main {
 
             config = Config.fromFile(wd+"/conf/config.json");
             LogWriter.Init(config);
-            TCPServer TCP = new TCPServer(running,picked, 9876,config.peerId, System.out,config.tcpTimeout,config.tcpMsgLimit);
-            UDPServer UDP = new UDPServer(running,picked,9876,System.out,config.peerId,config.broadcastFrequency,config.defaultTimeout)
+            TCPServer TCP = new TCPServer(running,picked, 9876,config.peerId, System.out,config.tcpClientTimeout,
+                config.tcpListenerTimeout,config.tcpMsgLimit);
+            UDPServer UDP = new UDPServer(running,picked,9876,System.out,config.peerId,config.broadcastFrequency,config.udpTimeout)
             .setTCP(TCP);
 
             new Thread(UDP).start();
@@ -64,8 +65,7 @@ public class Main {
                     continue;
                 }
                 if(input.equals("m")){
-                    System.out.println("Sending msg");
-                    TCP.sendMessage("peer","IT'S WORKING AS INTENDED");
+                    TCP.sendMessage("molic-peer1","IT'S ALIVE, IT'S ALIVEEE");
                 }
                 //System.out.println(client.sendEcho("Random msg :]"));
             }

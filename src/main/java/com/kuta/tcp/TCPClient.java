@@ -41,8 +41,9 @@ public class TCPClient implements Runnable{
      * @param myPeerId Peer id of the server
      * @param sysout System.out for printing info
      */
-    public TCPClient(InetAddress ip, int port,String endpointPeerId,String myPeerId, PrintStream sysout, String msg,MsgLock lock) {
+    public TCPClient(InetAddress ip, int port,int timeout,String endpointPeerId,String myPeerId, PrintStream sysout, String msg,MsgLock lock) {
         this.sysout = (sysout);
+        this.timeout = timeout;
         this.ip = ip;
         this.port = port;
         this.endpointPeerId = endpointPeerId;
@@ -58,7 +59,6 @@ public class TCPClient implements Runnable{
             out = new PrintWriter(client.getOutputStream(), true);
             in = new Scanner(client.getInputStream());
             sysout.println(TCPc+"|Connection established");
-            sysout.flush();
             running = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,17 +105,25 @@ public class TCPClient implements Runnable{
     public void run() {
         setup();
         try {
-            sysout.println(TCPc+"|"+send(HELLO));
+            String response = "";
+            try {
+                response = send(HELLO);
+                AnswerTCP answer = GsonParser.parser.fromJson(response,AnswerTCP.class);
+                if(answer.isValid()){
+                    sysout.println(TCPc+"Was valid");
+                }
+                sysout.println(TCPc+"Was not valid");
+            } catch (Exception e) {
+                sysout.println(TCPc+"Was not valid exc");
+            }
             while(running){
                 synchronized(lock){
                     lock.wait();
                     String msg = lock.msg;
-                    while(msg== null){
-                        System.out.println(TCPc+"| STILL NO UPDATE");
-                        Thread.sleep(100);
-                    }
-                    String response = send(newMessage(msg));
-                    sysout.println(TCPc+"|"+response);
+                    sysout.println(TCPc+"|Sending msg:"+msg);
+                    response = send(newMessage(msg));
+                    sysout.println(TCPc+"|FULL RESPONSE"+response);
+                    sysout.println(TCPc+"| Response:"+response);
                 }
                 Thread.sleep(4000);
             }

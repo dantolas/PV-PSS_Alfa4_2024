@@ -36,7 +36,8 @@ public class TCPServer implements Runnable{
     private int port;
     private ServerSocket server;
     private Socket peer;
-    private final int HANDLER_TIMEOUT;
+    private final int LISTENER_TIMEOUT;
+    private final int CLIENT_TIMEOUT;
 
     public String peerId;
     public volatile boolean running;
@@ -62,12 +63,14 @@ public class TCPServer implements Runnable{
      * @param handlerTimeout Timeout for receiving TCP packets
      * @param msgLimit Msg limit per minute for every TCP Client trying to send information to server
      */
-    public TCPServer(boolean running,InterfaceAddress ip, int port,String peerId, PrintStream out, int handlerTimeout,int msgLimit) {
+    public TCPServer(boolean running,InterfaceAddress ip, int port,String peerId,
+        PrintStream out, int clientTimeout,int listenerTimeout,int msgLimit) {
         this.peerId = peerId;
         this.ip = ip;
         this.sysout= (out);
         this.port = port;
-        this.HANDLER_TIMEOUT = handlerTimeout;
+        this.LISTENER_TIMEOUT = listenerTimeout;
+        this.CLIENT_TIMEOUT = clientTimeout;
         this.msgHistory = new HashMap<>(){{
             put("1",new Message("peer123","I'm a femboy"));
             put("2",new Message("I'm peer","I'm a peer"));
@@ -83,7 +86,7 @@ public class TCPServer implements Runnable{
 
     public void connectClient(InetAddress ip, int port,String endpointPeerId){
         outLocks.writeLock().lock();
-        this.outConnections.add(new TCPConnection(ip,port,endpointPeerId,this.peerId,this.sysout));
+        this.outConnections.add(new TCPConnection(ip,port,CLIENT_TIMEOUT,endpointPeerId,this.peerId,this.sysout));
         outLocks.writeLock().unlock();
     }
 
@@ -131,7 +134,7 @@ public class TCPServer implements Runnable{
             while(running){
                 peer = server.accept();
                 sysout.println(TCP+"|Handing peer to handler:"+ColorMe.green(peer.getInetAddress().toString()+":"+peer.getPort()));
-                new Thread(new TCPListener(this,peer,HANDLER_TIMEOUT)).start();
+                new Thread(new TCPListener(this,peer,LISTENER_TIMEOUT)).start();
                 //new Thread(new TCPHandler(this,new Socket(peer.getInetAddress(),peer.getPort()))).start();
             }
         } catch (IOException e) {

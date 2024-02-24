@@ -79,8 +79,8 @@ public class TCPListener implements Runnable{
             checkTimeout(waitingTime);
             try {
                 resp = in.nextLine();
-
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return resp;
@@ -104,7 +104,7 @@ public class TCPListener implements Runnable{
         String response = "{\"status\":\"bad\",\"reason\":\"Have some manners and introduce yourself first\"}";
         if(this.peerId == null){
             server.sysout.println(TCPh+"| Message received without proper manners and introduction");
-            out.write(response,0,response.getBytes().length);
+            out.println(response);
             return;
         }
         writeLock.lock();
