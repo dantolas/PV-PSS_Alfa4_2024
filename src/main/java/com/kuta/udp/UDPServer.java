@@ -105,7 +105,7 @@ public class UDPServer implements Runnable{
         out.println(UDP+"|Answer received");
         if(!answer.status.equalsIgnoreCase("ok")) return;
         if(knownPeers.containsKey(p.getSocketAddress())){
-            out.println(UDP+"|"+ColorMe.green(knownPeers.get(p.getSocketAddress()))+" already known");
+            out.print(UDP+"|"+ColorMe.green(knownPeers.get(p.getSocketAddress()))+" ");
             return;
         }
 
