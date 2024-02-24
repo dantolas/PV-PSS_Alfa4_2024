@@ -88,11 +88,12 @@ public class UDPServer implements Runnable{
      * @throws IOException If socket gets interrupted
      */
     private void handleQuestion(UDPQuestion question,DatagramPacket p) throws IOException{
-            out.println(UDP+"|Question received");
-            out.println(UDP+"|Sending response to:"+question.peerId);
-            p = createAnswer(p);
-            socket.send(p);
-            return;
+        out.println(UDP+"|Question received");
+        out.print("|Sending response to:"+question.peerId);
+        out.println();
+        p = createAnswer(p);
+        socket.send(p);
+        return;
     }
 
     /**
@@ -105,12 +106,12 @@ public class UDPServer implements Runnable{
         out.print(UDP+"|Answer received");
         if(!answer.status.equalsIgnoreCase("ok")) return;
         if(knownPeers.containsKey(p.getSocketAddress())){
-            out.print("|known "+ColorMe.green(knownPeers.get(p.getSocketAddress()))+" ");
+            out.println("|known "+ColorMe.green(knownPeers.get(p.getSocketAddress()))+" ");
             return;
         }
 
         knownPeers.put(p.getSocketAddress(),answer.peerId);
-        out.println(UDP+"|Added peer:"+ColorMe.green(answer.peerId)+"@"+ColorMe.green(p.getSocketAddress().toString()));
+        out.println("|Added peer:"+ColorMe.green(answer.peerId)+"@"+ColorMe.green(p.getSocketAddress().toString()));
         p = newPacket(p.getAddress(),p.getPort(),UDP+"|Answer fine,will attempt TCP conn to "+ColorMe.green(answer.peerId));
         socket.send(p);
         TCP.connectClient(p.getAddress(),9876,answer.peerId);
