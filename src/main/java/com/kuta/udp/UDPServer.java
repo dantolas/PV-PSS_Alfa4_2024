@@ -102,7 +102,7 @@ public class UDPServer implements Runnable{
      * @throws IOException If socket gets interrupted
      */
     private void handleAnswer(UDPAnswer answer, DatagramPacket p) throws IOException{
-        out.println(UDP+"|Answer received");
+        out.print(UDP+"|Answer received");
         if(!answer.status.equalsIgnoreCase("ok")) return;
         if(knownPeers.containsKey(p.getSocketAddress())){
             out.print(UDP+"|known "+ColorMe.green(knownPeers.get(p.getSocketAddress()))+" ");
