@@ -67,8 +67,8 @@ public class TCPClient implements Runnable{
             in.close();
             out.close();
             client.close();
-        } catch (IOException e) {
-        }
+        } catch (Exception e) {
+        } 
         sysout.println(TCPc+"|Connection closed");
     }
     public String newMessage(String msg){
