@@ -71,9 +71,8 @@ public class TCPClient implements Runnable{
         } 
         sysout.println(TCPc+"|Connection closed");
     }
-    public String newMessage(String msg){
-        return GsonParser.parser.toJson(new NewTCPMessage("new_message", Long.toString(System.currentTimeMillis())
-            ,msg));
+    public NewTCPMessage newMessage(String msg){
+        return new NewTCPMessage("new_message", Long.toString(System.currentTimeMillis()),msg);
     }
 
     private void checkTimeout(long timePassed) throws TimeoutException{
@@ -97,14 +96,6 @@ public class TCPClient implements Runnable{
         if(out == null) return "";
         out.println(txt);
         String resp = readResponse();
-        try {
-            AnswerTCP answer = GsonParser.parser.fromJson(resp,AnswerTCP.class);
-            if(answer.status.equalsIgnoreCase("ok")){
-                connection.historyLocks.writeLock().lock();
-                connection.historyLocks.writeLock().unlock();
-            }
-        } catch (Exception e) {
-        }
         return resp;
     }
     @Override
@@ -126,9 +117,19 @@ public class TCPClient implements Runnable{
             while(running){
                 synchronized(lock){
                     lock.wait();
-                    String msg = lock.msg;
-                    sysout.println(TCPc+"|Sending msg:"+msg);
-                    response = send(newMessage(msg));
+                    NewTCPMessage msgObj = newMessage(lock.msg);
+                    sysout.println(TCPc+"|Sending msg:"+lock.msg);
+                    response = send(GsonParser.parser.toJson(msgObj));
+                    try {
+                        AnswerTCP answer = GsonParser.parser.fromJson(response,AnswerTCP.class);
+                        if(answer.status.equalsIgnoreCase("ok")){
+                            connection.historyLocks.writeLock().lock();
+                            connection.msgHistory.
+                                put(msgObj.msgId,new Message(connection.serverPeerId,msgObj.msg));
+                            connection.historyLocks.writeLock().unlock();
+                        }
+                    } catch (Exception e) {
+                    }
                     sysout.println(TCPc+"| Response:"+response);
                 }
                 Thread.sleep(4000);
