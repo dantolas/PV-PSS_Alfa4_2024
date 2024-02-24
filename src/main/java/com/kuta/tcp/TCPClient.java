@@ -117,7 +117,6 @@ public class TCPClient implements Runnable{
                     String msg = lock.msg;
                     sysout.println(TCPc+"|Sending msg:"+msg);
                     response = send(newMessage(msg));
-                    sysout.println(TCPc+"|FULL RESPONSE"+response);
                     sysout.println(TCPc+"| Response:"+response);
                 }
                 Thread.sleep(4000);

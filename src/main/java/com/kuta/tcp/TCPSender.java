@@ -33,7 +33,6 @@ public class TCPSender implements Runnable{
     }
 
     private void sendMessage(String[] recipientAndMsg){
-        System.out.println(TCPs+"| RECEIVED SEND EVENT");
         String recipientPeerId = recipientAndMsg[0];
         String msg = recipientAndMsg[1];
         if(recipientPeerId.equalsIgnoreCase("all")){
@@ -57,11 +56,15 @@ public class TCPSender implements Runnable{
     }
 
     private void checkMsgsToSend(){
-        if(msgsToSend.peek() != null){
-            sendLocks.readLock().lock();
-            sendMessage(msgsToSend.poll());
+        
+        sendLocks.readLock().lock();
+        if(msgsToSend.peek() == null) {
             sendLocks.readLock().unlock();
+            return;
         }
+        System.out.println(msgsToSend.size());
+        sendMessage(msgsToSend.poll());
+        sendLocks.readLock().unlock();
     }
 
     public void setup(){
@@ -76,11 +79,6 @@ public class TCPSender implements Runnable{
     public void run() {
         setup();
         while(running){
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-            }
-            System.out.println(TCPs+"|"+msgsToSend.size());
             checkMsgsToSend();
         }
         tearDown();
