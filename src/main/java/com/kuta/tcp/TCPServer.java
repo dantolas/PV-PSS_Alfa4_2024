@@ -159,6 +159,7 @@ public class TCPServer implements Runnable{
         new Thread(sender).start();
         sysout.println(TCP+"|TCP SERVER LISTENING ON "
             +ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
+        sendMessage("molic-peer-1","lockTest");
     }
 
     /**
