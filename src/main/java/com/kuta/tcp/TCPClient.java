@@ -1,6 +1,5 @@
 package com.kuta.tcp;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;

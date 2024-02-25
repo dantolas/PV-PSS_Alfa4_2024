@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
@@ -41,9 +42,9 @@ public class UDPServer implements Runnable{
     private byte[] buf = new byte[512];
     private final String UDP = ColorMe.purple("UDP");
 
-    private final int  BROADCAST_TIMER; //Miliseconds
-    private final int DEFAULT_TIMEOUT; //Miliseconds
-    private final String PEER_ID;
+    private int broadcastTimer; //Miliseconds
+    private int defaultTimeout; //Miliseconds
+    private String peerId;
     private final String MSG_SPLIT_REGEX = "^\\s*(\\w)\\s*[:;,-_=]*\\s*";
     public final Gson GSON; 
     public static HashMap<SocketAddress,String> knownPeers;
@@ -61,17 +62,37 @@ public class UDPServer implements Runnable{
      * @param defaultTimeout Default timeout for sending and receiving packets
      * @throws SocketException
      */
-    public UDPServer(boolean running,InterfaceAddress ip,int port,PrintStream outStream,String peerId,int broadcastTimer,int defaultTimeout) throws SocketException {
+    @Autowired
+    public UDPServer() {
         UDPServer.knownPeers = new HashMap<>();
         UDPServer.lock = new ReentrantReadWriteLock();
-        this.out = outStream;
-        this.port = port;
-        this.ip = ip;
-        this.PEER_ID = peerId;
-        this.BROADCAST_TIMER = broadcastTimer;
-        this.DEFAULT_TIMEOUT = defaultTimeout;
-        this.socket = new DatagramSocket(port,ip.getAddress());
+        this.out = System.out;
         GSON = GsonParser.parser;
+    }
+
+    public UDPServer setIp(InterfaceAddress ip){
+        this.ip = ip;
+        return this;
+    }
+    public UDPServer setPort(int port){
+        this.port = port;
+        return this;
+    }
+    public UDPServer setPeerId(String peerId){
+        this.peerId= peerId;
+        return this;
+    }
+    public UDPServer setBroadcastTimer(int timer){
+        this.broadcastTimer = timer;
+        return this;
+    }
+    public UDPServer setDefaultTimeout(int timeout){
+        this.defaultTimeout = timeout;
+        return this;
+    }
+    public UDPServer setSocket() throws SocketException{
+        this.socket = new DatagramSocket(this.port,this.ip.getAddress());
+        return this;
     }
 
     public UDPServer setTCP(TCPServer TCP){
@@ -84,7 +105,7 @@ public class UDPServer implements Runnable{
      * @throws IOException If socket gets interrupted
      */
     private void broadcastHello() throws IOException{
-        DatagramPacket helloPacket = newPacket(ip.getBroadcast(),port,"{\"command\":\"hello\",\"peer_id\":\""+PEER_ID+"\"}");
+        DatagramPacket helloPacket = newPacket(ip.getBroadcast(),port,"{\"command\":\"hello\",\"peer_id\":\""+peerId+"\"}");
         socket.send(helloPacket);
     }
 
@@ -182,7 +203,7 @@ public class UDPServer implements Runnable{
      * @return DatagramPacket ready to be sent
      */
     private DatagramPacket createAnswer(DatagramPacket question){
-        String answerMsg = "{\"status\":\"ok\",\"peer_id\":\""+PEER_ID+"\"}";
+        String answerMsg = "{\"status\":\"ok\",\"peer_id\":\""+this.peerId+"\"}";
         return new DatagramPacket(answerMsg.getBytes(),answerMsg.getBytes().length,question.getSocketAddress());
     }
 
@@ -204,7 +225,7 @@ public class UDPServer implements Runnable{
         out.println(UDP+"|STARTING UDP SERVER|");
         running = true;
         out.println(UDP+"|UDP SERVER RUNNING ON "+ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
-        socket.setSoTimeout(DEFAULT_TIMEOUT);
+        socket.setSoTimeout(defaultTimeout);
     }
 
     @Override
@@ -226,7 +247,7 @@ public class UDPServer implements Runnable{
 
             while (running) {
                 long timeSinceBS = (System.currentTimeMillis()-lastBSTime);
-                if(timeSinceBS >= BROADCAST_TIMER){
+                if(timeSinceBS >= broadcastTimer){
                     lastBSTime = System.currentTimeMillis();
                     out.println(ColorMe.purple("=============="));
                     out.println(UDP+"|SENDING BROADCAST|");
@@ -234,7 +255,7 @@ public class UDPServer implements Runnable{
                     broadcastHello();
                 }
                 try {
-                    int timeout = Math.abs((int)(BROADCAST_TIMER - timeSinceBS));
+                    int timeout = Math.abs((int)(broadcastTimer - timeSinceBS));
                     if(timeout <= 0) timeout = 1;
                     socket.setSoTimeout(timeout);
                     socket.receive(packet);

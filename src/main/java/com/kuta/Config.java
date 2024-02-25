@@ -3,6 +3,8 @@ package com.kuta;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.springframework.stereotype.Component;
+
 import com.google.gson.annotations.SerializedName;
 import com.kuta.util.IO;
 import com.kuta.vendor.GsonParser;
@@ -10,6 +12,7 @@ import com.kuta.vendor.GsonParser;
 /**
  * Config
  */
+@Component
 public class Config {
     @SerializedName("broadcast_frequency_milis")
     public int broadcastFrequency;

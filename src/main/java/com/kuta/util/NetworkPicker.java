@@ -12,20 +12,23 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
 
+import org.springframework.stereotype.Service;
+
 import com.kuta.util.color.ColorMe;
 
 /**
  * Used for gathering network interfaces information, and then selecting a specific
  * interface to be used with the rest of the program
  */
+@Service
 public class NetworkPicker {
 
     private PrintStream out;
     private InputStream in;
     private Scanner scanner;
-    public NetworkPicker(PrintStream out, InputStream in) {
-        this.out = out;
-        this.in = in;
+    public NetworkPicker() {
+        this.out = System.out;
+        this.in = System.in;
         this.scanner = new Scanner(this.in);
     }
 

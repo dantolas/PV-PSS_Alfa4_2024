@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8"/>
+    <title>KutaAlfa4</title>
+    <link rel="stylesheet" href="css/style.css"/>
+  </head>
+  <body>
+        <main>
+            <div class="sender">
+                
+                <h1>Alfa4 Message Sender</h1>
+                <div class="custom-select">
+                    <span>Send to: </span>
+                    <select>
+                        <option value="">Everyone</option>
+                        <option value="">Place</option>
+                        <option value="">Holder</option>
+                        <option value="">Lorem</option>
+                        <option value="">Ipsum</option>
+                    </select>
+                </div>
+                <textarea rows="" class="msg" name="msg" cols="" placeholder="Enter a message..."></textarea>
+                <input class="send" type="submit" name="send" value="Send">
+            </div>
+            <div class="messages">
+                <ul class="">
+                    <li th:each="message:${msgs}">
+                        <div class="message">
+                            <span class="author" th:text="${message.author}">author</span>
+                            <span class="messageContent" th:text="${message.msg}">Some message I sent</span>
+                            <span class="messageId" th:text="${message.id}">My ID</span>
+                        </div>
+
+                    </li>
+                </ul>
+            </div>
+        </main>
+  </body>
+</html>

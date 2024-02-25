@@ -1,17 +1,17 @@
-package com.kuta.udp;
+package com.kuta.web.backend;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * UDPSpringConfiguration
+ * AppConfiguration
  */
 @Configuration
-public class UDPSpringConfiguration {
+public class AppConfiguration {
 
     @Bean
-    public UDPServer udpServer(){
-        return null;
+    public boolean running(){
+        return true;
     }
     
 }

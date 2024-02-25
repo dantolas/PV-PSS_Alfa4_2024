@@ -48,7 +48,7 @@ public class TCPListener implements Runnable{
         this.timeout = timeout;
         this.readLock = server.historyLocks.readLock();
         this.writeLock = server.historyLocks.writeLock();
-        this.msgLimit = server.receiveMsgLimit;
+        this.msgLimit = server.msgLimit;
     }
 
     private void checkTimeout(long timePassed) throws TimeoutException{

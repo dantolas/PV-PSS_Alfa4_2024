@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.SocketException;
 
+import org.springframework.stereotype.Service;
+
 import com.kuta.util.color.ColorMe;
 import com.kuta.util.log.LogWriter;
 import com.kuta.util.log.LogWriterInitException;
@@ -16,14 +18,15 @@ import com.kuta.util.log.LogWriterInitException;
  * Handling is achieved by using a specific handle() method with the specific Exception
  * for different implementation
  */
+@Service
 public class ErrorHandler {
 
-    private PrintStream out;
+    private final PrintStream out;
 
     private final String ERROR = ColorMe.red("|ERROR|");
 
-    public ErrorHandler(PrintStream outputStream){
-        this.out = outputStream;
+    public ErrorHandler(){
+        this.out = System.out;
     }
 
     public void handle(SocketException e){

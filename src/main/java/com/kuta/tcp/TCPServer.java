@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.kuta.util.color.ColorMe;
@@ -39,8 +40,8 @@ public class TCPServer implements Runnable{
     private int port;
     private ServerSocket server;
     private Socket peer;
-    private final int LISTENER_TIMEOUT;
-    private final int CLIENT_TIMEOUT;
+    private int LISTENER_TIMEOUT;
+    private int CLIENT_TIMEOUT;
 
     public String peerId;
     public volatile boolean running;
@@ -49,7 +50,7 @@ public class TCPServer implements Runnable{
 
     public TreeMap<String,Message> msgHistory;
     public ReadWriteLock historyLocks;
-    public int receiveMsgLimit;
+    public int msgLimit;
 
     private List<TCPConnection> outConnections;
     private ReadWriteLock outLocks;
@@ -66,25 +67,44 @@ public class TCPServer implements Runnable{
      * @param handlerTimeout Timeout for receiving TCP packets
      * @param msgLimit Msg limit per minute for every TCP Client trying to send information to server
      */
-    public TCPServer(boolean running,InterfaceAddress ip, int port,String peerId,
-        PrintStream out, int clientTimeout,int listenerTimeout,int msgLimit) {
-        this.peerId = peerId;
-        this.ip = ip;
-        this.sysout= (out);
-        this.port = port;
-        this.LISTENER_TIMEOUT = listenerTimeout;
-        this.CLIENT_TIMEOUT = clientTimeout;
+    @Autowired
+    public TCPServer() {
+        this.sysout= System.out;
         this.msgHistory = new TreeMap<>((id1,id2)-> Long.compare(Long.parseLong(id1),Long.parseLong(id2))){{
             put("1",new Message("peer123","I'm a femboy"));
             put("2",new Message("I'm peer","I'm a peer"));
             put("3",new Message("Definitely not peer","I'm not a peer"));
         }};
         this.historyLocks = new ReentrantReadWriteLock();
-        this.receiveMsgLimit = msgLimit;
         this.msgsToSend = new LinkedList<>();
         this.sendLocks = new ReentrantReadWriteLock();
         this.outConnections = new ArrayList<>();
         this.outLocks = new ReentrantReadWriteLock();
+    }
+
+    public TCPServer setPeerId(String peerId){
+        this.peerId = peerId;
+        return this;
+    }
+    public TCPServer setIp(InterfaceAddress ip){
+        this.ip = ip;
+        return this;
+    }
+    public TCPServer setPort(int port){
+        this.port = port;
+        return this;
+    }
+    public TCPServer setListenerTimeout(int listenerTimeout){
+        this.LISTENER_TIMEOUT = listenerTimeout;
+        return this;
+    }
+    public TCPServer setClientTimeout(int clientTimeout){
+        this.CLIENT_TIMEOUT = clientTimeout;
+        return this;
+    }
+    public TCPServer setMsgLimit(int limitPerMinute){
+        this.msgLimit = limitPerMinute;
+        return this;
     }
 
     public void connectClient(InetAddress ip, int port,String endpointPeerId){
