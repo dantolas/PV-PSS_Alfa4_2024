@@ -12,9 +12,12 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import com.kuta.util.color.ColorMe;
+
+import jakarta.annotation.PostConstruct;
 
 /**
  * Used for gathering network interfaces information, and then selecting a specific
@@ -32,8 +35,15 @@ public class NetworkPicker {
         this.scanner = new Scanner(this.in);
     }
 
+    private InterfaceAddress ipPicked;
 
-    public InterfaceAddress pickAddress() throws SocketException{
+
+    @Bean
+    public InterfaceAddress ip(NetworkPicker picker) throws SocketException{
+        return this.ipPicked;
+    }
+    @PostConstruct
+    public void pickAddress() throws SocketException{
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         ArrayList<NetworkInterface> nifList = Collections.list(interfaces);
 
@@ -49,7 +59,6 @@ public class NetworkPicker {
 
         if(options.isEmpty()){
             out.println("No viable ipv4 address found. Make sure you are connected to a network.");
-            return null;
         }
 
         int i = 1;
@@ -63,7 +72,7 @@ public class NetworkPicker {
         }
         out.println(ColorMe.blue("Please pick the ip addr to listen to."));
         int input = readInputInt(1,options.size());
-        return options.get(input-1);
+        this.ipPicked = options.get(input-1);
     }
 
     private int readInputInt(int min, int max){

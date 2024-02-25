@@ -13,5 +13,11 @@ public class AppConfiguration {
     public boolean running(){
         return true;
     }
+
+
+    @Bean
+    public int port() {
+        return 9876;
+    }
     
 }

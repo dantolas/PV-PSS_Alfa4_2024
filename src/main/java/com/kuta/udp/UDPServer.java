@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+import com.kuta.Config;
 import com.kuta.tcp.TCPServer;
 import com.kuta.util.color.ColorMe;
 import com.kuta.vendor.GsonParser;
@@ -63,11 +64,19 @@ public class UDPServer implements Runnable{
      * @throws SocketException
      */
     @Autowired
-    public UDPServer() {
+    public UDPServer(Config config, InterfaceAddress ip, int port, boolean running,TCPServer tcpServer) throws SocketException {
         UDPServer.knownPeers = new HashMap<>();
         UDPServer.lock = new ReentrantReadWriteLock();
         this.out = System.out;
         GSON = GsonParser.parser;
+
+        this.ip = ip;
+        this.port = port;
+        this.peerId = config.peerId;
+        this.broadcastTimer = config.broadcastFrequency;
+        this.defaultTimeout = config.udpTimeout;
+        this.socket = new DatagramSocket(port,ip.getAddress());
+        this.TCP = tcpServer;
     }
 
     public UDPServer setIp(InterfaceAddress ip){

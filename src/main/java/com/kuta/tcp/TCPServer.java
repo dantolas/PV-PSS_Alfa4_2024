@@ -18,6 +18,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.kuta.Config;
 import com.kuta.util.color.ColorMe;
 
 /**
@@ -40,8 +41,8 @@ public class TCPServer implements Runnable{
     private int port;
     private ServerSocket server;
     private Socket peer;
-    private int LISTENER_TIMEOUT;
-    private int CLIENT_TIMEOUT;
+    private int listenerTimeout;
+    private int clientTimeout;
 
     public String peerId;
     public volatile boolean running;
@@ -68,7 +69,7 @@ public class TCPServer implements Runnable{
      * @param msgLimit Msg limit per minute for every TCP Client trying to send information to server
      */
     @Autowired
-    public TCPServer() {
+    public TCPServer(Config config,InterfaceAddress ip, int port,boolean running) {
         this.sysout= System.out;
         this.msgHistory = new TreeMap<>((id1,id2)-> Long.compare(Long.parseLong(id1),Long.parseLong(id2))){{
             put("1",new Message("peer123","I'm a femboy"));
@@ -80,6 +81,14 @@ public class TCPServer implements Runnable{
         this.sendLocks = new ReentrantReadWriteLock();
         this.outConnections = new ArrayList<>();
         this.outLocks = new ReentrantReadWriteLock();
+
+        this.peerId = config.peerId;
+        this.ip = ip;
+        this.port = port;
+        this.listenerTimeout = config.tcpListenerTimeout;
+        this.clientTimeout = config.tcpClientTimeout;
+        this.msgLimit = config.tcpMsgLimit;
+        
     }
 
     public TCPServer setPeerId(String peerId){
@@ -95,11 +104,11 @@ public class TCPServer implements Runnable{
         return this;
     }
     public TCPServer setListenerTimeout(int listenerTimeout){
-        this.LISTENER_TIMEOUT = listenerTimeout;
+        this.listenerTimeout = listenerTimeout;
         return this;
     }
     public TCPServer setClientTimeout(int clientTimeout){
-        this.CLIENT_TIMEOUT = clientTimeout;
+        this.clientTimeout = clientTimeout;
         return this;
     }
     public TCPServer setMsgLimit(int limitPerMinute){
@@ -110,7 +119,7 @@ public class TCPServer implements Runnable{
     public void connectClient(InetAddress ip, int port,String endpointPeerId){
         outLocks.writeLock().lock();
         this.outConnections.add(
-            new TCPConnection(ip,port,CLIENT_TIMEOUT,endpointPeerId,this.peerId,this.sysout)
+            new TCPConnection(ip,port,clientTimeout,endpointPeerId,this.peerId,this.sysout)
             .setMsgHistory(msgHistory, historyLocks)
             .setSelfDeleting(outConnections,outLocks)
             .setup()
@@ -171,7 +180,7 @@ public class TCPServer implements Runnable{
             while(running){
                 peer = server.accept();
                 sysout.println(TCP+"|Handing peer to handler:"+ColorMe.green(peer.getInetAddress().toString()+":"+peer.getPort()));
-                new Thread(new TCPListener(this,peer,LISTENER_TIMEOUT)).start();
+                new Thread(new TCPListener(this,peer,listenerTimeout)).start();
             }
         } catch (IOException e) {
             sysout.println(TCP+ColorMe.red("|Error occured on server"));

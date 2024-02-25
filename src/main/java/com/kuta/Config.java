@@ -9,6 +9,8 @@ import com.google.gson.annotations.SerializedName;
 import com.kuta.util.IO;
 import com.kuta.vendor.GsonParser;
 
+import jakarta.annotation.PostConstruct;
+
 /**
  * Config
  */
@@ -27,9 +29,19 @@ public class Config {
     @SerializedName("msg_limit_minute")
     public int tcpMsgLimit;
 
-    public Config() {
-    }
 
+    public Config(){}
+
+    @PostConstruct
+    public void setup() throws FileNotFoundException, IOException{
+        Config conf = fromFile("conf/config.json");
+        this.broadcastFrequency = conf.broadcastFrequency;
+        this.tcpClientTimeout = conf.tcpClientTimeout;
+        this.udpTimeout = conf.udpTimeout;
+        this.tcpMsgLimit = conf.tcpMsgLimit;
+        this.tcpListenerTimeout = conf.tcpListenerTimeout;
+        this.peerId = conf.peerId;
+    }
     @Override
     public String toString() {
         return GsonParser.parser.toJson(this);
