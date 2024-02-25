@@ -11,8 +11,9 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.kuta.tcp.TCPServer;
@@ -26,6 +27,7 @@ import com.kuta.vendor.GsonParser;
  * Implements Runnable interface to be run as a Thread
  * To run the server either create a new Thread and start it or just call the run() method
  */
+@Service
 public class UDPServer implements Runnable{
 
 
