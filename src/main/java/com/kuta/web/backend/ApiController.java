@@ -35,9 +35,10 @@ public class ApiController {
     }
     @GetMapping("/send")
     public String messages(@RequestParam(name="message", required=true, 
-        defaultValue="Default message. Next time provide message value please") String msg){
+        defaultValue="Default message. Next time provide message value please") String msg,@RequestParam(name="peer", required=true, 
+        defaultValue="all") String recipient){
         System.out.println("MSG INPUT:"+msg);
-        tcpServer.sendMessage("all",msg);
+        tcpServer.sendMessage(recipient,msg);
         return "{\"status\":\"ok\"}";
     }
 }

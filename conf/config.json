@@ -4,5 +4,6 @@
     "broadcast_frequency_milis":5000,
     "tcp_client_timeout":10000,
     "tcp_listener_timeout":10000,
-    "msg_limit_minute":50
+    "msg_limit_minute":50,
+    "ipv4_addr":"auto"
 }

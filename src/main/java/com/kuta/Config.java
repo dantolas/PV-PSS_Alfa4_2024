@@ -28,6 +28,8 @@ public class Config {
     public int tcpListenerTimeout;
     @SerializedName("msg_limit_minute")
     public int tcpMsgLimit;
+    @SerializedName("ipv4_addr")
+    public String ip;
 
 
     public Config(){}
@@ -41,6 +43,7 @@ public class Config {
         this.tcpMsgLimit = conf.tcpMsgLimit;
         this.tcpListenerTimeout = conf.tcpListenerTimeout;
         this.peerId = conf.peerId;
+        this.ip = conf.ip;
     }
     @Override
     public String toString() {

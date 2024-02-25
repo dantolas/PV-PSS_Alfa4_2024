@@ -33,7 +33,7 @@ dependencies{
 tasks {
   withType<Jar> {
         manifest {
-            attributes["Main-Class"] = "com.kuta.Main" 
+            attributes("Main-Class" to  "com.kuta.Main")
         }
 
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Exclude duplicates
@@ -50,20 +50,10 @@ tasks {
         manifest {
             attributes("Main-Class" to "com.kuta.Main")
         }
-  }
+    }
 }
 
 // Pass default system input to gradle run (Default input stream)
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
-}
-
-tasks.named<Test>("test") {
-    useJUnitPlatform()
-
-    maxHeapSize = "1G"
-
-    testLogging {
-        events("passed")
-    }
 }

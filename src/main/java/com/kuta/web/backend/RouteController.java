@@ -30,8 +30,14 @@ public class RouteController {
     }};
 
     private final List<MessageModel> msgs;
+    private final List<String> peers;
     public RouteController(){
         this.msgs = messages;
+        this.peers = new ArrayList<>(){{
+            add("molic-peer-1");
+            add("molic-peer-2");
+            add("molic-peer-3");
+        }};
     }
 
 	@GetMapping("/greeting")
@@ -42,6 +48,7 @@ public class RouteController {
 	@GetMapping("/")
 	public String index(Model model) { 
         model.addAttribute("msgs",msgs);
+        model.addAttribute("peers",peers);
 		return "index";
 	}
 

@@ -56,8 +56,11 @@ public class TCPServer implements Runnable{
 
     private List<TCPConnection> outConnections;
     private ReadWriteLock outLocks;
-    public Queue<String[]> msgsToSend;
-    public ReadWriteLock sendLocks;
+
+    public class newMsgLock{
+        public String[] msgAndRecipient;
+    }
+    private newMsgLock msgLock;
 
     /**
      * Main constructor for creating a new TCPServer
@@ -70,7 +73,6 @@ public class TCPServer implements Runnable{
      * @param msgLimit Msg limit per minute for every TCP Client trying to send information to server
      */
     @Autowired
-    @Lazy
     public TCPServer(Config config,InterfaceAddress ip, int port,boolean running) {
         this.sysout= System.out;
         this.msgHistory = new TreeMap<>((id1,id2)-> Long.compare(Long.parseLong(id1),Long.parseLong(id2))){{
@@ -78,11 +80,11 @@ public class TCPServer implements Runnable{
             put("3",new Message("Definitely not peer","I'm not a peer"));
         }};
         this.historyLocks = new ReentrantReadWriteLock();
-        this.msgsToSend = new LinkedList<>();
-        this.sendLocks = new ReentrantReadWriteLock();
+        //this.msgsToSend = new LinkedList<>();
+        //this.sendLocks = new ReentrantReadWriteLock();
         this.outConnections = new ArrayList<>();
         this.outLocks = new ReentrantReadWriteLock();
-
+        this.msgLock = new newMsgLock();
         this.peerId = config.peerId;
         this.ip = ip;
         this.port = port;
@@ -129,9 +131,10 @@ public class TCPServer implements Runnable{
     }
 
     public void sendMessage(String recipientPeerId, String message){
-        sendLocks.writeLock().lock();
-        msgsToSend.add(new String[]{recipientPeerId,message});
-        sendLocks.writeLock().unlock();
+        synchronized(this.msgLock){
+        msgLock.msgAndRecipient = new String[]{recipientPeerId,message};
+        msgLock.notify();
+        }
     }
     public static void syncMessages(TreeMap<String,Message> msgHistory,TreeMap<String,Message> syncMsgs){
         for(Map.Entry<String,Message> entry : syncMsgs.entrySet()){
@@ -152,7 +155,7 @@ public class TCPServer implements Runnable{
     public void setup(){
         sysout.println(TCP+"|STARTING TCP SERVER|");
         running = true;
-        TCPSender sender = new TCPSender(this.running,outConnections, outLocks, msgsToSend, sendLocks, sysout);
+        TCPSender sender = new TCPSender(this.running,outConnections, outLocks,msgLock, sysout);
         new Thread(sender).start();
         sysout.println(TCP+"|TCP SERVER LISTENING ON "
             +ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");

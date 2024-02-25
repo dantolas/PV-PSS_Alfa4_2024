@@ -3,19 +3,22 @@ package com.kuta.util;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.kuta.Config;
 import com.kuta.util.color.ColorMe;
 
 import jakarta.annotation.PostConstruct;
@@ -30,10 +33,25 @@ public class NetworkPicker {
     private PrintStream out;
     private InputStream in;
     private Scanner scanner;
-    public NetworkPicker() {
+
+    @Autowired
+    public NetworkPicker(Config config) throws SocketException, UnknownHostException {
         this.out = System.out;
         this.in = System.in;
         this.scanner = new Scanner(this.in);
+        if(config.ip.equalsIgnoreCase("auto")){
+            this.ipPicked = pickAddressAuto();
+            return;
+        }
+        if(config.ip.equalsIgnoreCase("manual")){
+            this.ipPicked = pickAddress();
+            return;
+        }
+
+        this.ipPicked = pickAddress(config.ip);
+
+        
+
     }
 
     private InterfaceAddress ipPicked;
@@ -43,8 +61,62 @@ public class NetworkPicker {
     public InterfaceAddress ip(NetworkPicker picker) throws SocketException{
         return this.ipPicked;
     }
-    @PostConstruct
-    public void pickAddress() throws SocketException{
+
+
+    public InterfaceAddress pickAddress(String ipString) throws SocketException, UnknownHostException{
+        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        ArrayList<NetworkInterface> nifList = Collections.list(interfaces);
+
+        out.println(ColorMe.blue("|Automatically choosing network address|"));
+        List<InterfaceAddress> options = new ArrayList<>();
+        for (NetworkInterface ni: nifList) {
+            if(ni.isLoopback()) continue;
+            for(InterfaceAddress ip : ni.getInterfaceAddresses()){
+                if(!(ip.getAddress() instanceof Inet4Address)) continue;
+                if(ip.getBroadcast() == null) continue;
+                if(!ip.getAddress().equals(InetAddress.getByName(ipString))) continue;
+                out.println(ColorMe.blue("|Address Picked|)"));
+                out.println("- "+ColorMe.green("Hostname")+":"+ip.getAddress().getHostName());
+                out.println("- "+ColorMe.green("IPv4")+":"+ip.getAddress());
+                out.println("- "+ColorMe.green("Broadcast IP")+":"+ip.getBroadcast());
+                this.ipPicked = ip;
+                return ip;
+            }
+        }
+
+        if(options.isEmpty()){
+            out.println("No viable ipv4 address found. Make sure you are connected to a network.");
+        }
+        return null;
+    }
+    public InterfaceAddress pickAddressAuto() throws SocketException{
+        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        ArrayList<NetworkInterface> nifList = Collections.list(interfaces);
+
+        out.println(ColorMe.blue("|Automatically choosing network address|"));
+        List<InterfaceAddress> options = new ArrayList<>();
+        for (NetworkInterface ni: nifList) {
+            if(ni.isLoopback()) continue;
+            for(InterfaceAddress ip : ni.getInterfaceAddresses()){
+                if(!(ip.getAddress() instanceof Inet4Address)) continue;
+                if(ip.getBroadcast() == null) continue;
+                out.println("##################");
+                out.println(ColorMe.blue("|Address Picked|)"));
+                out.println("- "+ColorMe.green("Hostname")+":"+ip.getAddress().getHostName());
+                out.println("- "+ColorMe.green("IPv4")+":"+ip.getAddress());
+                out.println("- "+ColorMe.green("Broadcast IP")+":"+ip.getBroadcast());
+                this.ipPicked = ip;
+                return ip;
+            }
+        }
+
+        if(options.isEmpty()){
+            out.println("No viable ipv4 address found. Make sure you are connected to a network.");
+        }
+        return null;
+    }
+
+    public InterfaceAddress pickAddress() throws SocketException{
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         ArrayList<NetworkInterface> nifList = Collections.list(interfaces);
 
@@ -73,9 +145,8 @@ public class NetworkPicker {
         }
         out.println(ColorMe.blue("Please pick the ip addr to listen to."));
         int input = readInputInt(1,options.size());
-        this.ipPicked = options.get(input-1);
+        return options.get(input-1);
     }
-
     private int readInputInt(int min, int max){
         int number = 0;
         while(true){

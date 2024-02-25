@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.locks.ReadWriteLock;
 
+import com.kuta.tcp.TCPConnection.MsgLock;
+import com.kuta.tcp.TCPServer.newMsgLock;
 import com.kuta.util.color.ColorMe;
 
 /**
@@ -17,17 +19,16 @@ public class TCPSender implements Runnable{
     private PrintStream sysout;
     public List<TCPConnection> outConnections;
     public ReadWriteLock outLocks;
+    public newMsgLock msgLock;
     public Queue<String[]> msgsToSend;
     public ReadWriteLock sendLocks;
     private boolean running;
 
-    public TCPSender(boolean running,List<TCPConnection> outConnections,ReadWriteLock outLocks, Queue<String[]> msgsToSend,
-        ReadWriteLock sendLocks, PrintStream sysout) {
+    public TCPSender(boolean running,List<TCPConnection> outConnections,ReadWriteLock outLocks, newMsgLock msgLock, PrintStream sysout) {
         this.running = running;
         this.outConnections = outConnections;
         this.outLocks = outLocks;
-        this.msgsToSend = msgsToSend;
-        this.sendLocks = sendLocks;
+        this.msgLock = msgLock;
         this.sysout = sysout;
         TCPs = ColorMe.yellow("TCPs");
     }
@@ -35,6 +36,11 @@ public class TCPSender implements Runnable{
     private void sendMessage(String[] recipientAndMsg){
         String recipientPeerId = recipientAndMsg[0];
         String msg = recipientAndMsg[1];
+        if(outConnections.size() == 0){
+            sysout.println(TCPs+"|No active connections, can't send msg:" + ColorMe.green(msg));
+            return;
+        }
+        
         if(recipientPeerId.equalsIgnoreCase("all")){
             outLocks.readLock().lock();
             for (TCPConnection tcpConnection : outConnections) {
@@ -55,16 +61,6 @@ public class TCPSender implements Runnable{
         sysout.println(TCPs+"|Didn't find message recipient " + ColorMe.green(recipientPeerId));
     }
 
-    private void checkMsgsToSend(){
-        
-        sendLocks.readLock().lock();
-        if(msgsToSend.peek() == null) {
-            sendLocks.readLock().unlock();
-            return;
-        }
-        sendMessage(msgsToSend.poll());
-        sendLocks.readLock().unlock();
-    }
 
     public void setup(){
         sysout.println(TCPs+"|Starting TCP Sender");
@@ -78,7 +74,14 @@ public class TCPSender implements Runnable{
     public void run() {
         setup();
         while(running){
-            checkMsgsToSend();
+            synchronized(msgLock){
+                try {
+                    msgLock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                sendMessage(msgLock.msgAndRecipient);
+            }
         }
         tearDown();
     }

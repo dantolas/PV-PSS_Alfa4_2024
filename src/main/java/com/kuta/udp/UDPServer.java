@@ -65,7 +65,6 @@ public class UDPServer implements Runnable{
      * @throws SocketException
      */
     @Autowired
-    @Lazy
     public UDPServer(Config config, InterfaceAddress ip, int port, boolean running,TCPServer tcpServer) throws SocketException {
         UDPServer.knownPeers = new HashMap<>();
         UDPServer.lock = new ReentrantReadWriteLock();
