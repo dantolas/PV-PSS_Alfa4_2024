@@ -94,9 +94,9 @@ connection is attempted.
 - Spring boot web framework
 
 ## Shortcomings,failures and things to be improved
-Application is quite heavy on the processor, so it will have trouble running on weaker systems.
-Didn't get to make a .jar executable file for simple startup, due to mysterious issues with 
-creating a fat jar with spring boot plugins.
-Logging is very minimal and barely does anything, could be completely overhauled, didn't care enough.
-Due to time limitations the Website couldn't be made as pretty or as smooth as I wanted. So the UX
+- Application is quite heavy on the processor, so it will have trouble running on weaker systems.
+- Didn't get to make a .jar executable file for simple startup, due to mysterious issues with 
+- creating a fat jar with spring boot plugins.
+- Logging is very minimal and barely does anything, could be completely overhauled, didn't care enough.
+- Due to time limitations the Website couldn't be made as pretty or as smooth as I wanted. So the UX
 is not great, but it works.
