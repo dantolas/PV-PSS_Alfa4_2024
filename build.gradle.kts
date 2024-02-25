@@ -10,7 +10,13 @@ plugins{
     id ("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.springframework.boot") version "3.2.3" 
 }
-
+sourceSets {
+    main {
+        java {
+            srcDirs("src/main/java")
+        }
+    }
+}
 apply(plugin = "io.spring.dependency-management")
 
 application {
@@ -42,14 +48,22 @@ tasks {
     }
     }
     shadowJar {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Exclude duplicates
-        exclude("META-INF/LICENSE.txt") // Exclude the specific file causing conflict
         archiveBaseName.set("alfa_4")
         destinationDirectory.set(File("./"))
         mergeServiceFiles()
         manifest {
             attributes("Main-Class" to "com.kuta.Main")
         }
+    }
+    bootJar{
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Exclude duplicates
+            exclude("META-INF/LICENSE.txt") // Exclude the specific file causing conflict
+        archiveFileName.set("app.jar")
+        manifest {
+            attributes("Main-Class" to "com.kuta.Main")
+        }
+        archiveBaseName.set("app.jar")
+        destinationDirectory.set(file("./"))
     }
 }
 

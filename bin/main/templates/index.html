@@ -10,18 +10,18 @@
             <div class="sender">
                 
                 <h1>Alfa4 Message Sender</h1>
-                <div class="custom-select">
-                    <span>Send to: </span>
-                    <select>
-                        <option value="">Everyone</option>
-                        <option value="">Place</option>
-                        <option value="">Holder</option>
-                        <option value="">Lorem</option>
-                        <option value="">Ipsum</option>
-                    </select>
-                </div>
-                <textarea rows="" class="msg" name="msg" cols="" placeholder="Enter a message..."></textarea>
-                <input class="send" type="submit" name="send" value="Send">
+                <form action="/send">
+                    
+                    <div class="custom-select">
+                        <span>Send to: </span>
+                        <select name="peer" value="peer">
+                            <option value="all">Everyone</option>
+                            <option th:each="peer:${peers}" th:text="${peer}" th:value="${peer}"></option>
+                        </select>
+                    </div>
+                    <textarea rows="" class="msg" name="message" cols="" placeholder="Enter a message..."></textarea>
+                    <input class="send" type="submit" value="Send">
+                </form>
             </div>
             <div class="messages">
                 <ul class="">
