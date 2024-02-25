@@ -184,7 +184,6 @@ public class TCPServer implements Runnable{
             server = new ServerSocket(port,0,ip.getAddress());
             while(running){
                 peer = server.accept();
-                sendMessage("molic-peer-1","lockTest");
                 sysout.println(TCP+"|Handing peer to handler:"+ColorMe.green(peer.getInetAddress().toString()+":"+peer.getPort()));
                 new Thread(new TCPListener(this,peer,listenerTimeout)).start();
             }

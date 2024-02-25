@@ -76,6 +76,7 @@ public class TCPSender implements Runnable{
         while(running){
             synchronized(msgLock){
                 try {
+                    sysout.println(TCPs+"|Sender waiting");
                     msgLock.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
