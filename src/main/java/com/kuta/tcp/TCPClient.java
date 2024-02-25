@@ -109,7 +109,6 @@ public class TCPClient implements Runnable{
                 if(answer.isValid()){
                     sysout.println(TCPc+"|Syncinc message histories");
                     connection.historyLocks.writeLock().lock();
-                    if(connection.msgHistory.size() >=100) connection.msgHistory.pollFirstEntry();
                     TCPServer.syncMessages(connection.msgHistory,answer.messages);
                     connection.historyLocks.writeLock().unlock();
                 }
@@ -126,7 +125,8 @@ public class TCPClient implements Runnable{
                         if(answer.status.equalsIgnoreCase("ok")){
                             connection.historyLocks.writeLock().lock();
                             connection.msgHistory.
-                                put(msgObj.msgId,new Message(connection.serverPeerId,msgObj.msg));
+                            put(msgObj.msgId,new Message(connection.serverPeerId,msgObj.msg));
+                            if(connection.msgHistory.size() >=100) connection.msgHistory.pollFirstEntry();
                             connection.historyLocks.writeLock().unlock();
                         }
                     } catch (Exception e) {
