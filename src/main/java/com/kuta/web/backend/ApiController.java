@@ -13,6 +13,9 @@ import com.google.gson.GsonBuilder;
 import com.kuta.tcp.Message;
 import com.kuta.tcp.TCPServer;
 @RestController
+/**
+ * This class serves as the controller for the API Endpoints 
+ */
 public class ApiController {
     
     private final TCPServer tcpServer;
@@ -21,6 +24,10 @@ public class ApiController {
     public ApiController(TCPServer tcpServer){
         this.tcpServer = tcpServer;
     }
+    /**
+     * Returns the current msg history maintaned by the TCP server
+     * @return JSON representation of the msg history
+     */
     @GetMapping("/messages")
     public String messages(){
         tcpServer.historyLocks.readLock().lock();
@@ -33,6 +40,12 @@ public class ApiController {
         tcpServer.historyLocks.readLock().unlock();
         return response;
     }
+    /**
+     * Endpoint for sending a message
+     * @param msg Message to be sent, has a default value
+     * @param recipient Peer to send the message to, default to everyone
+     * @return Status message 
+     */
     @GetMapping("/send")
     public String messages(@RequestParam(name="message", required=true, 
         defaultValue="Default message. Next time provide message value please") String msg,@RequestParam(name="peer", required=true, 

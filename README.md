@@ -1,7 +1,8 @@
 
-# Project alfa 4 -- Network p-to-p chat
+# Project alfa 4 -- Network P2P  chat with a web UI
 ## School project for SPŠE Ječná (Střední průmyslová škola elektrotechnická, Praha 2, Ječná 30)
 ## AUTHOR: Kuta Samuel C4b 
+## [Github Repo](https://github.com/dantolas/PV-PSS_Alfa4_2024)
 
 ## Table of contents (TOC)
 ==========================
@@ -13,26 +14,18 @@
 6. [Docs](#docs)
 7. [Architecture and design patterns](#architecture-and-design-patterns)
 8. [Application runtime behavior](#app-runtime-behaviour)
-7. [Testing](#testing-and-test-scenarios)
-8. [Dependencies](#dependencies)
-9. [Shortcomings](#things-to-work-on-and-shortcomings)
+9. [Dependencies](#dependencies)
+9. [Shortcomings](#shortcomings,failures+and+things+to+be+improved)
 
 ## Introduction
-This application provides a database design for managing medical ePrescriptions
-for medication.
-
-It also provides an **API** to work with mentioned **database**, and a CLI that can
-operate on the **API**.
-
-The application provides basic CRUD functionality, along with generating data
-reports and a degree of configuration.
-
+This application runs a UDPServer and a TCPServer on selected local network.
+It attempts to first find other peers through UDP Discovery, and then it mannages TCP connections
+with found peers.
+After a connection is established, the application provides a web UI and RESTAPI endpoints for
+sending messages and seeing or receiving the message history.
 ## Requirements
 `Java` - version *20.0.1*+
-`Git` - *OPTIONAL*
-`MySQL Server` - version *8.0.30*+
-`Gradle` - version *9.4*+ *OPTIONAL*
-
+`Gradle` - version *9.4*+ 
 ## Installation
 Clone this repository from the command line
 `git clone address <directory>`
@@ -42,67 +35,32 @@ Or download the entire repository as a zip file
 Make sure that ideally all the requirements are installed, or at least the mandatory ones.
 See [Requirements](#requirements)
 
-### DB Setup
-Navigate to *db/exports* and locate the **schema.sql** and **data.sql** files.
-Import the schema and the data to your **MySQL** database using your favorite approach.
-If everything imported correctly, that database can now be used with this application.
-
 ## Usage
-BEFORE running the application, make sure u have completed all steps and configured your
-database entry point in *conf/config.json*. 
-- See [Configurations](#configurations) for default configuration values and what should be configured.
+Navigate to the project directory and execute this command:
+`./gradlew run`
+I didn't manage to get a .jar archive executable working due to mysterious issues yet to be solved.
 
-Double click the **alfa3-all.jar** file and the program should start.
+However I have provided the **chat.service** file to turn any working .jar file into a linux service
+that can be started and managed with **systemctl**
 
-Alternatively execute this command from the command line
-`java -jar alfa3-all.jar`
-
-The User Interface will then guide you through further usage of the application.
-U can also view **test scenarios** in */test*. See [Testing](#testing-and-test-scenarios)
+After u start the program u can access the [Webpage](http://localhost:8080/)
 
 ## Configurations
-U can configure the database access point, but make sure u have the schema
-set up correctly as mentioned in [Installation](##instalation)
-
-Configurations are read from the *conf/* **config.json** file. 
+U can configure various aspects of the application in the **conf/config.json** file.
 - Make sure this file exists and it's struture complies with the examples below.
-
-This file can be modified to change the database connection point; 
-
 
 **config** file example:
 
 
     {
-        "db":{
-            "database_host":"localhost:3306",
-            "database_name":"yourDB",
-            "username":"username",
-            "password":"password"
-        }
-
+        "peer_id":"kuta",
+        "udp_timeout":30000,
+        "broadcast_frequency_milis":5000,
+        "tcp_client_timeout":10000,
+        "tcp_listener_timeout":10000,
+        "msg_limit_minute":50,
+        "ipv4_addr":"auto"
     }
-
-**Default configuration**
-- For the default configuration ensure all the values are equal to:`default`
-- **Default configuration**:
-
-        {
-            "db":{
-                "database_host":"default",
-                "database_name":"default",
-                "username":"default",
-                "password":"default"
-            }
-
-        }
-- What are the **default** values?
-    - `host` : localhost:3306
-    - `name` : alfa3
-    - `username` : su
-    - `password` : student
-    
-
 
 ## Docs
 - **Developer documentation** 
@@ -115,65 +73,30 @@ This file can be modified to change the database connection point;
     - Or just read the src code and documentation directly if u dare :]
 - **User documentation**
     - This can be considered as user documentation and should be read thoroughly.
-    - Additional information and guides can be found in test scenarios.
 
 ## Architecture and design patterns
-### Application
-- The entire application is developed (or at least attempted) using **Three tier**
-design architecture.
-- A tier of an application can only communicate with the tier below and above it.
-- **UI Tier** <--> **Application Tier** <--> **Data Tier**
-- Application is seperated into three tiers:
-    - **User interface tier**
-    User interacts with only this tier of the application
-
-    - **Application tier**
-    This layer serves as an API that connects the layers and can do work with both of them.
-
-    - **Data tier**
-    This layer is responsible for connecting to database and providing means of receiving data and 
-    processing and saving data.
-    - Data tier uses the DAO design pattern to shape data from database into Class instance objects
-    that are then handled by the application tier
-### Database
-- **Logical Diagram**
-![Logical diagram](./db/Logical.png)
-- **Relational Diagram**
-![Relational diagram](./db/Relational_1.png)
+The entire application is developed in Java v20.
+## Web Application
+App uses Spring boot web framework for creating a simple tomcat web server.
+Spring boot uses a MVC architecture, so that is also used in this application.
+## TCP/UDP
+Both TCP and UDP communication is done with builtin Java libraries, in a P2P style with all 
+information being contained in RAM.
     
 ## App runtime behaviour
-- The application first initializes itself and tests database connection. If everything is correctly
-setup and configured, the application starts it's run cycle.
-- Application is command based and waits for user input. Once the user inputs a command, the
-command hadnler of the **UI Tier** of the application communicates with the **Application Tier**
-from where work can be done.
-- All erros that could occur are caught by the **Application Tier** ErrorHandler class, that handles
-different exceptions appropriately.
-
-
-## Testing and Test scenarios
-- U can find all test scenarios in *test/* as .pdf files 
-- Reading this documentation is however still advised as the test scenarios function just as quick
-guides
-- The program does not contain any unit tests
-
-
+The application first initializes and sets everything up.
+Then it will periodically broadcast UDP packets to an IPv4 broadcast address.
+If it receives a valid response or detects the same broadcast from someone else, a 2 way TCP
+connection is attempted.
 
 ## Dependencies
 - Google.com GSON Json parsing and serialization tool. See [GSON](https://github.com/google/gson) 
-- MySql JDBC Driver. See [MySQL Connector/J](https://mvnrepository.com/artifact/com.mysql/mysql-connector-j)
+- Spring boot web framework
 
-## Things to work on and shortcomings
-- The application does not provide a great way to delete data from db if the 
-rows depend on each other. This couldn't be implemented due to lack of time.
-- The User Interface is quite bland and boring. Colors couldn't be implemented
-due to lack of time.
-- The application doesn't provide perfect information to solve every error 
-encountered in the user interface. This couldn't be implemented due to lack of time.
-- Application uses a three tier architecture, however I'm inexperienced with
-building three tier applications so the implementation propably isn't very good.
-- Imports also couldn't be implemented due to lack of time and burnout.
-- Reports were originally meant to be generated in .pdf format, but this would
-be very time consumign manually and most libraries that accomlpish this have 
-some not so great licensing requirements
-
+## Shortcomings,failures and things to be improved
+Application is quite heavy on the processor, so it will have trouble running on weaker systems.
+Didn't get to make a .jar executable file for simple startup, due to mysterious issues with 
+creating a fat jar with spring boot plugins.
+Logging is very minimal and barely does anything, could be completely overhauled, didn't care enough.
+Due to time limitations the Website couldn't be made as pretty or as smooth as I wanted. So the UX
+is not great, but it works.

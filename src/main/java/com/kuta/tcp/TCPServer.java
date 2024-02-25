@@ -7,16 +7,13 @@ import java.net.InterfaceAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.kuta.Config;
@@ -54,8 +51,8 @@ public class TCPServer implements Runnable{
     public ReadWriteLock historyLocks;
     public int msgLimit;
 
-    private List<TCPConnection> outConnections;
-    private ReadWriteLock outLocks;
+    public List<TCPConnection> outConnections;
+    public ReadWriteLock outLocks;
 
     public class newMsgLock{
         public String[] msgAndRecipient;

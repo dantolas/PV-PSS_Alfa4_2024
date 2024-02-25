@@ -63,6 +63,14 @@ public class NetworkPicker {
     }
 
 
+    /**
+     * Tries to match the given ip string to an ip currently assigned on one of the device network
+     * interfaces. It attempts to parse the ipString to an InetAddress, and then compares it.
+     * @param ipString String representation of an IPv4 addr
+     * @return InterfaceAddress if it finds one, null if it doesn't
+     * @throws SocketException
+     * @throws UnknownHostException
+     */
     public InterfaceAddress pickAddress(String ipString) throws SocketException, UnknownHostException{
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         ArrayList<NetworkInterface> nifList = Collections.list(interfaces);
@@ -89,6 +97,11 @@ public class NetworkPicker {
         }
         return null;
     }
+    /**
+     * Automatically grabs the first IPv4 ip it finds on any of the network interfaces.
+     * @return InterfaceAddress 
+     * @throws SocketException
+     */
     public InterfaceAddress pickAddressAuto() throws SocketException{
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         ArrayList<NetworkInterface> nifList = Collections.list(interfaces);
@@ -116,6 +129,12 @@ public class NetworkPicker {
         return null;
     }
 
+    /**
+     * Used for more thorough manual selection of the used IP address.
+     * Checks all interfaces and lets the user pick by reading user input
+     * @return Selected InterfaceAddress
+     * @throws SocketException
+     */
     public InterfaceAddress pickAddress() throws SocketException{
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         ArrayList<NetworkInterface> nifList = Collections.list(interfaces);

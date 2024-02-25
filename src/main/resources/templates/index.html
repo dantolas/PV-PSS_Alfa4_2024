@@ -10,13 +10,13 @@
             <div class="sender">
                 
                 <h1>Alfa4 Message Sender</h1>
-                <form action="/send">
+                <form class="sendForm" action="/send">
                     
                     <div class="custom-select">
                         <span>Send to: </span>
                         <select name="peer" value="peer">
                             <option value="all">Everyone</option>
-                            <option th:each="peer:${peers}" th:text="${peer}" th:value="${peer}"></option>
+                            <option classth:each="peer:${peers}" th:text="${peer}" th:value="${peer}"></option>
                         </select>
                     </div>
                     <textarea rows="" class="msg" name="message" cols="" placeholder="Enter a message..."></textarea>

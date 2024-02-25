@@ -12,7 +12,7 @@ import com.kuta.vendor.GsonParser;
 import jakarta.annotation.PostConstruct;
 
 /**
- * Config
+ * Object for JSON serialization and deserialization
  */
 @Component
 public class Config {

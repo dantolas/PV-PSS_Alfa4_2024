@@ -51,6 +51,16 @@ public class ErrorHandler {
             out.println("Couldn't write log, trying to reinitialize...");
         }
     }
+    public void handle(Exception e){
+        out.println(ERROR+"A general exception occured");
+        String newLogId;
+        try {
+            newLogId = LogWriter.writeErrorLog(e);
+            System.out.println("Please refer to log with id:"+newLogId);
+        } catch (IOException e1) {
+            out.println("Couldn't write log, trying to reinitialize...");
+        }
+    }
 
     public void handle(LogWriterInitException e){
         out.println(ERROR+" Cannot find or access the error log file. Please ensure that the file"+

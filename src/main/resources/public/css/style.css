@@ -80,7 +80,6 @@ select:hover{
 }
 
 select option{
-
     color: var(--txt-secondary);
     background:var(--bg-third);
 }
