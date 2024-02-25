@@ -109,6 +109,7 @@ public class TCPClient implements Runnable{
                 if(answer.isValid()){
                     sysout.println(TCPc+"|Syncinc message histories");
                     connection.historyLocks.writeLock().lock();
+                    if(connection.msgHistory.size() >=100) connection.msgHistory.pollFirstEntry();
                     TCPServer.syncMessages(connection.msgHistory,answer.messages);
                     connection.historyLocks.writeLock().unlock();
                 }

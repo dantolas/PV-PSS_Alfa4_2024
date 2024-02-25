@@ -14,6 +14,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
@@ -64,6 +65,7 @@ public class UDPServer implements Runnable{
      * @throws SocketException
      */
     @Autowired
+    @Lazy
     public UDPServer(Config config, InterfaceAddress ip, int port, boolean running,TCPServer tcpServer) throws SocketException {
         UDPServer.knownPeers = new HashMap<>();
         UDPServer.lock = new ReentrantReadWriteLock();

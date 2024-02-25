@@ -109,6 +109,7 @@ public class TCPListener implements Runnable{
         }
         writeLock.lock();
         server.sysout.println(TCPh+"|Adding new msg");
+        if(server.msgHistory.size() >=100) server.msgHistory.pollFirstEntry();
         server.msgHistory.put(newMsg.msgId,new Message(peerId,newMsg.msg));
         server.sysout.println(server.msgHistory);
         writeLock.unlock();

@@ -16,6 +16,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.kuta.Config;
@@ -69,10 +70,10 @@ public class TCPServer implements Runnable{
      * @param msgLimit Msg limit per minute for every TCP Client trying to send information to server
      */
     @Autowired
+    @Lazy
     public TCPServer(Config config,InterfaceAddress ip, int port,boolean running) {
         this.sysout= System.out;
         this.msgHistory = new TreeMap<>((id1,id2)-> Long.compare(Long.parseLong(id1),Long.parseLong(id2))){{
-            put("1",new Message("peer123","I'm a femboy"));
             put("2",new Message("I'm peer","I'm a peer"));
             put("3",new Message("Definitely not peer","I'm not a peer"));
         }};
@@ -135,6 +136,7 @@ public class TCPServer implements Runnable{
     public static void syncMessages(TreeMap<String,Message> msgHistory,TreeMap<String,Message> syncMsgs){
         for(Map.Entry<String,Message> entry : syncMsgs.entrySet()){
             if(msgHistory.keySet().contains(entry.getKey())) continue;
+            if(msgHistory.size() >=100) msgHistory.pollFirstEntry();
             msgHistory.put(entry.getKey(),entry.getValue());
         }
     }

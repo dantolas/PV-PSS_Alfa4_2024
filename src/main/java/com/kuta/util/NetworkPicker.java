@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.kuta.util.color.ColorMe;
