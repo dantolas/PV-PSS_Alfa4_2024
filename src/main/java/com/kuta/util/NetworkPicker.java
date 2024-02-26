@@ -21,8 +21,6 @@ import org.springframework.stereotype.Service;
 import com.kuta.Config;
 import com.kuta.util.color.ColorMe;
 
-import jakarta.annotation.PostConstruct;
-
 /**
  * Used for gathering network interfaces information, and then selecting a specific
  * interface to be used with the rest of the program

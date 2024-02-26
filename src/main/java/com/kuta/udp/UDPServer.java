@@ -9,12 +9,12 @@ import java.net.InterfaceAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
@@ -36,6 +36,7 @@ public class UDPServer implements Runnable{
 
     private int port;
     private InterfaceAddress ip;
+    private InetAddress broadcastAddr;
     private DatagramSocket socket;
     private TCPServer TCP;
 
@@ -72,6 +73,7 @@ public class UDPServer implements Runnable{
         GSON = GsonParser.parser;
 
         this.ip = ip;
+        this.broadcastAddr = ip.getAddress();
         this.port = port;
         this.peerId = config.peerId;
         this.broadcastTimer = config.broadcastFrequency;
@@ -218,6 +220,16 @@ public class UDPServer implements Runnable{
     }
 
     /**
+     * Checks the broadcastAddress for specific conditions that have to be met
+     * @throws UnknownHostException 
+     */
+    public void checkBroadcast() throws UnknownHostException{
+        if(broadcastAddr.equals(InetAddress.getByName("0.0.0.0"))) {
+            broadcastAddr = InetAddress.getByName("172.16.255.255");
+        }
+    }
+
+    /**
      * Relases all resources and shuts down the server
      */
     public void tearDown(){
@@ -235,6 +247,11 @@ public class UDPServer implements Runnable{
         out.println(UDP+"|STARTING UDP SERVER|");
         running = true;
         out.println(UDP+"|UDP SERVER RUNNING ON "+ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
+        try {
+            checkBroadcast();
+        } catch (UnknownHostException e) {
+            broadcastAddr = ip.getBroadcast();
+        }
         socket.setSoTimeout(defaultTimeout);
     }
 
