@@ -245,13 +245,13 @@ public class UDPServer implements Runnable{
     public void setup() throws SocketException{
 
         out.println(UDP+"|STARTING UDP SERVER|");
-        running = true;
-        out.println(UDP+"|UDP SERVER RUNNING ON "+ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
         try {
             checkBroadcast();
         } catch (UnknownHostException e) {
             broadcastAddr = ip.getBroadcast();
         }
+        running = true;
+        out.println(UDP+"|UDP SERVER RUNNING ON "+ColorMe.green(ip.getAddress().toString())+":"+ColorMe.green(Integer.toString(port))+"|");
         socket.setSoTimeout(defaultTimeout);
     }
 
