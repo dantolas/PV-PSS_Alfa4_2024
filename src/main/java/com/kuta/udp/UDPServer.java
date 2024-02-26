@@ -224,7 +224,7 @@ public class UDPServer implements Runnable{
      * @throws UnknownHostException 
      */
     public void checkBroadcast() throws UnknownHostException{
-        if(broadcastAddr.equals(InetAddress.getByName("0.0.0.0"))) {
+        if(broadcastAddr.equals(InetAddress.getByName("0.0.0.0")) || broadcastAddr.toString().equals("/0.0.0.0")) {
             broadcastAddr = InetAddress.getByName("172.16.255.255");
         }
     }
