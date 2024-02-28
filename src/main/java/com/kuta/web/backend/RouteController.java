@@ -14,10 +14,10 @@ import com.kuta.tcp.Message;
 import com.kuta.tcp.TCPConnection;
 import com.kuta.tcp.TCPServer;
 
-@Controller
 /**
  * Controller for static web content
  */
+@Controller
 public class RouteController {
 
     private final TCPServer tcpServer;

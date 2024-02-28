@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
 :root{
     font-size:18px;
@@ -123,6 +122,13 @@ select option:hover{
 .send:hover{
     cursor:pointer;
     opacity: 0.93;
+}
+
+.sendForm{
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    gap:1rem;
 }
 
 ul{

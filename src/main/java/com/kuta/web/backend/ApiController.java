@@ -12,10 +12,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kuta.tcp.Message;
 import com.kuta.tcp.TCPServer;
-@RestController
 /**
  * This class serves as the controller for the API Endpoints 
  */
+@RestController
 public class ApiController {
     
     private final TCPServer tcpServer;
