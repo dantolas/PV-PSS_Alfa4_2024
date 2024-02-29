@@ -1,6 +1,7 @@
 package com.kuta.web.backend;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +67,7 @@ public class RouteController {
             msgs.add(new MessageModel(entry.getValue().peerId,entry.getValue().message,entry.getKey()));
         }
         tcpServer.historyLocks.readLock().unlock();
+        Collections.reverse(msgs);
     }
 
 }
