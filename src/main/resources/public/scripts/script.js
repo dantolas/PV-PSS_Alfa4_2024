@@ -8,9 +8,26 @@ $(".refresh").on("click",()=>{
         dataType: "json",
         success: function(response) {
             $(".message").remove();
+            var newMessages = $("<div></div>");
+            newMessages.class = "messages";
+
             response.forEach(message => {
-                console.log(message);
-                console.log(message.author);
+                var newMessage = $("<div></div>");
+                var author = $("<span></spam>");
+                var content = $("<span></spam>");
+                var id= $("<span></spam>");
+                author.class = "author";
+                author.text = message.author;
+                content.class = "messageContent";
+                content.text=message.msg;
+                id.class = "messageId";
+                id.text = message.id;
+
+                $(newMessage).prepend(author);
+                $(newMessage).prepend(content);
+                $(newMessage).prepend(id);
+
+                $(newMessages).prepend(newMessage);
             });
         },
         error: function(status, error) {
