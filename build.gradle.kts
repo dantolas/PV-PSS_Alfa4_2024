@@ -9,7 +9,6 @@ plugins{
     java
 	id("org.springframework.boot") version "3.2.3"
 	id("io.spring.dependency-management") version "1.1.4"
-    war
 }
 application {
     mainClass = "com.kuta.Main"
@@ -29,7 +28,7 @@ java {
 }
 tasks {
   withType<Jar> {
-          exclude("META-INF/LICENSE.txt") // Exclude the specific file causing conflict
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         manifest {
             attributes("Main-Class" to  "com.kuta.Main")
         }
@@ -39,8 +38,8 @@ tasks {
         }
     }
     bootJar{
-        //archiveBaseName.set("app")
-        //destinationDirectory.set(file("./"))
+        archiveBaseName.set("app")
+        destinationDirectory.set(file("./"))
     }
 }
 
