@@ -4,6 +4,25 @@ $(".refresh").on("click",()=>{
     refresh();
 });
 
+$(".send").on("click",(event)=>{
+    event.preventDefault();
+});
+
+function send(){
+    $.ajax({
+        url: "/send",
+        method: "GET",
+        dataType: "json",
+        success: function(response) {
+            console.log(response);
+        },
+        error: function(status, error) {
+            alert("Couldn't refresh page");
+        }
+    });
+
+}
+
 function refresh(){
     $.ajax({
         url: "/messages",
