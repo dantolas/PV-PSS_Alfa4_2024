@@ -11,7 +11,9 @@ import com.kuta.util.color.ColorMe;
 import com.kuta.vendor.GsonParser;
 
 /**
- * TCPClient
+ * Class containing functionality of a TCP Client.
+ * Connects to a TCP Server listening on specified ip and port, and can then send messages to the 
+ * server. Whenever a message is sent, it is stored in TCPServer.msgHistory 
  */
 public class TCPClient implements Runnable{
     public boolean running;
@@ -45,6 +47,9 @@ public class TCPClient implements Runnable{
         this.connection = connection;
     }
 
+    /**
+     * Setup the client before running it 
+     */
     public void setup() {
         sysout.println(TCPc+"|Attempting connection to "+ColorMe.green(endpointPeerId)+ip+":"+port);
         try {
@@ -60,6 +65,9 @@ public class TCPClient implements Runnable{
     }
 
 
+    /**
+     * Kill the client with relasing as much resources as possible
+     */
     public void tearDown() {
         sysout.println(TCPc+"|Closing tcp connection");
         try {
@@ -72,9 +80,18 @@ public class TCPClient implements Runnable{
         connection.end();
     }
 
+    /**
+     * Check timeout for sending and receiving information
+     * @param timePassed
+     * @throws TimeoutException
+     */
     private void checkTimeout(long timePassed) throws TimeoutException{
         if(timePassed > timeout) throw new TimeoutException("Connection timed out");
     };
+    /**
+     * @return
+     * @throws TimeoutException
+     */
     private String readResponse() throws TimeoutException{
         String resp = null;
         long timeStartedWaiting = System.currentTimeMillis();
@@ -89,6 +106,11 @@ public class TCPClient implements Runnable{
         }
         return resp;
     }
+    /**
+     * @param txt
+     * @return
+     * @throws TimeoutException
+     */
     public String send(String txt) throws TimeoutException {
         if(out == null) return "";
         out.println(txt);
