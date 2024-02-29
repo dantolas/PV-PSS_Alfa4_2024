@@ -10,15 +10,22 @@ $(".send").on("click",(event)=>{
 });
 
 function send(){
+    var messageVal = $(".msg").val();
+    var peerVal = $(".select").val();
     $.ajax({
         url: "/send",
         method: "GET",
         dataType: "json",
+        data:{
+            message:messageVal,
+            peer:peerVal
+            },
         success: function(response) {
-            console.log(response);
+            alert("Message sent");
+            refresh();
         },
         error: function(status, error) {
-            alert("Couldn't refresh page");
+            alert("Error occured, message not sent");
         }
     });
 

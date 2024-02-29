@@ -23,7 +23,7 @@
                     
                     <div class="custom-select">
                         <span>Send to: </span>
-                        <select name="peer" value="peer">
+                        <select class="select" name="peer" value="peer">
                             <option value="all">Everyone</option>
                             <option th:each="peer:${peers}" th:text="${peer}" th:value="${peer}"></option>
                         </select>
