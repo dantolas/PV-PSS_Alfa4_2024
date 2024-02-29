@@ -18,10 +18,9 @@ import com.kuta.udp.UDPServer;
 public class TCPConnection implements Comparable<TCPConnection>{
 
     public class MsgLock{
-        public String msg;
+        public NewTCPMessage msg;
 
         public MsgLock(){
-            msg = "";
         }
     }
     public String serverPeerId;
@@ -75,9 +74,9 @@ public class TCPConnection implements Comparable<TCPConnection>{
      * to send it to the other side
      * @param message
      */
-    public void sendMessage(String message){
+    public void sendMessage(NewTCPMessage msgObj){
         synchronized(this.lock){
-            this.lock.msg = message;
+            this.lock.msg = msgObj;
             lock.notify();
         }
     }

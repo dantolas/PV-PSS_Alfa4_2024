@@ -52,6 +52,7 @@ public class RouteController {
     private void updatePeers(){
         this.peers.clear();
         tcpServer.outLocks.readLock().lock();
+        System.out.println("BACKEND ACTIVE CONNS:"+tcpServer.outConnections.size());
         for(TCPConnection activeConn : tcpServer.outConnections){
             this.peers.add(activeConn.endpointPeerId);
         }

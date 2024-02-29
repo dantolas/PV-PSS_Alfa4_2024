@@ -71,9 +71,6 @@ public class TCPClient implements Runnable{
         sysout.println(TCPc+"|Connection closed");
         connection.end();
     }
-    public NewTCPMessage newMessage(String msg){
-        return new NewTCPMessage("new_message", Long.toString(System.currentTimeMillis()),msg);
-    }
 
     private void checkTimeout(long timePassed) throws TimeoutException{
         if(timePassed > timeout) throw new TimeoutException("Connection timed out");
@@ -117,15 +114,14 @@ public class TCPClient implements Runnable{
             while(running){
                 synchronized(lock){
                     lock.wait();
-                    NewTCPMessage msgObj = newMessage(lock.msg);
-                    sysout.println(TCPc+"|Sending msg:"+lock.msg);
-                    response = send(GsonParser.parser.toJson(msgObj));
+                    sysout.println(TCPc+"|Sending msg:"+lock.msg.msg);
+                    response = send(GsonParser.parser.toJson(lock.msg));
                     try {
                         AnswerTCP answer = GsonParser.parser.fromJson(response,AnswerTCP.class);
                         if(answer.status.equalsIgnoreCase("ok")){
                             connection.historyLocks.writeLock().lock();
                             connection.msgHistory.
-                            put(msgObj.msgId,new Message(connection.serverPeerId,msgObj.msg));
+                            put(lock.msg.msgId,new Message(connection.serverPeerId,lock.msg.msg));
                             if(connection.msgHistory.size() >=100) connection.msgHistory.pollFirstEntry();
                             connection.historyLocks.writeLock().unlock();
                         }

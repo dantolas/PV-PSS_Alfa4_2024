@@ -44,6 +44,17 @@ public class TCPSender implements Runnable{
         TCPs = ColorMe.yellow("TCPs");
     }
 
+
+    /**
+     * Create new newTCPMessage object containing the message, command and id
+     * @param msg Text content of the message
+     * @return NewTCPMessage object with the command = "new_message" and "message_id" = 
+     * currentTimeMillist()
+     */
+    public NewTCPMessage newMessage(String msg){
+        return new NewTCPMessage("new_message", Long.toString(System.currentTimeMillis()),msg);
+    }
+
     /**
      * Send new message. The recipient and message are both lockated in 
      * newMsgLock msgLock.
@@ -58,11 +69,12 @@ public class TCPSender implements Runnable{
             sysout.println(TCPs+"|No active connections, can't send msg:" + ColorMe.green(msg));
             return;
         }
+        NewTCPMessage msgObj = newMessage(msg);
         
         if(recipientPeerId.equalsIgnoreCase("all")){
             outLocks.readLock().lock();
             for (TCPConnection tcpConnection : outConnections) {
-                tcpConnection.sendMessage(msg);
+                tcpConnection.sendMessage(msgObj);
             }
             outLocks.readLock().unlock();
             return;
@@ -71,7 +83,7 @@ public class TCPSender implements Runnable{
         outLocks.readLock().lock();
         for (TCPConnection tcpConnection : outConnections) {
             if(!tcpConnection.endpointPeerId.equals(recipientPeerId)) continue;
-            tcpConnection.sendMessage(msg);
+            tcpConnection.sendMessage(msgObj);
             outLocks.readLock().unlock();
             return;
         }
