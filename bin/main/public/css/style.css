@@ -38,6 +38,8 @@ body::-webkit-scrollbar{
 }
 main{
     display: flex;
+    max-height: 100%;
+    height: 100vh;
 }
 .sender{
     margin-left:1rem;
@@ -128,7 +130,7 @@ select option:hover{
     display: flex;
     flex-direction: column;
     align-items: left;
-    gap:1rem;
+    gap:20px;
 }
 
 ul{
@@ -141,6 +143,7 @@ ul li{
 ul li:hover{
     list-style: none;
     opacity: 0.93;
+    cursor:pointer;
 }
 
 .messages{
@@ -149,7 +152,7 @@ ul li:hover{
     width: 50%;
     border-radius: 10px;;
     border: 1px solid var(--txt-secondary);
-    height: 80%;
+    height: 600px;
     padding:1rem;
     margin-right:1rem;
     margin-top:1.5rem;

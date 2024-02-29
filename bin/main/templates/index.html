@@ -12,6 +12,7 @@
                 
                 <h1>Alfa4 Message Sender</h1>
                 <form class="sendForm" action="/send">
+                    
                     <div class="custom-select">
                         <span>Send to: </span>
                         <select name="peer" value="peer">
@@ -24,16 +25,11 @@
                 </form>
             </div>
             <div class="messages">
-                <ul class="">
-                    <li th:each="message:${msgs}">
-                        <div class="message">
-                            <span class="author" th:text="${message.author}">author</span>
-                            <span class="messageContent" th:text="${message.msg}">Some message I sent</span>
-                            <span class="messageId" th:text="${message.id}">My ID</span>
-                        </div>
-
-                    </li>
-                </ul>
+                <div th:each="message:${msgs}" class="message">
+                    <span class="author" th:text="${message.author}">author</span>
+                    <span class="messageContent" th:text="${message.msg}">Some message I sent</span>
+                    <span class="messageId" th:text="${message.id}">My ID</span>
+                </div>
             </div>
         </main>
   </body>
