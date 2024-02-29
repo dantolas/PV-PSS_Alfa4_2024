@@ -9,7 +9,7 @@ $(".refresh").on("click",()=>{
         success: function(response) {
             $(".message").remove();
             response.forEach(message => {
-                console.out(message);
+                console.log(message);
             });
         },
         error: function(status, error) {
