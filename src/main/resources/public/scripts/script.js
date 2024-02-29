@@ -1,15 +1,16 @@
 console.log("Hello there :]");
 
 $(".refresh").on("click",()=>{
-    console.log("Overriden by jq");
+    refresh();
+});
+
+function refresh(){
     $.ajax({
         url: "/messages",
         method: "GET",
         dataType: "json",
         success: function(response) {
             $(".message").remove();
-            var newMessages = $("<div></div>");
-            newMessages.addClass("messages");
 
             response.forEach(message => {
                 var newMessage = $("<div></div>");
@@ -24,17 +25,17 @@ $(".refresh").on("click",()=>{
                 id.addClass("messageId");;
                 id.text(message.id);
 
-                $(newMessage).prepend(author);
-                $(newMessage).prepend(content);
                 $(newMessage).prepend(id);
+                $(newMessage).prepend(content);
+                $(newMessage).prepend(author);
 
-                $(newMessages).prepend(newMessage);
+                $(".messages").prepend(newMessage);
             });
-            $(".messages").replaceWith(newMessages);
+            //$(".messages").replaceWith(newMessages);
         },
         error: function(status, error) {
             alert("Couldn't refresh page");
         }
     });
-});
+}
 
