@@ -159,6 +159,7 @@ ul li:hover{
     display: flex;
     flex-direction: column;
     position: relative;
+        transition: ease 30ms;
 }
 .refresh{
     position: fixed;
