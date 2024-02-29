@@ -158,6 +158,21 @@ ul li:hover{
     overflow-x:hidden;
     display: flex;
     flex-direction: column;
+    position: relative;
+}
+.refresh{
+    position: fixed;
+    top:2;
+    right:2;
+    background: var(--bg-primary);
+    color: var(--txt-primary);
+    padding:0.4rem;
+    border-radius:10px;
+}
+
+.refresh:hover{
+    cursor:pointer;
+    opacity:0.93;
 }
 
 .message{

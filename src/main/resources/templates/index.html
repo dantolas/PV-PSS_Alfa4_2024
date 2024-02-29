@@ -3,7 +3,15 @@
   <head>
     <meta charset="UTF-8"/>
     <title>KutaAlfa4</title>
-        <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" 
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" 
+        crossorigin="anonymous">
+        </script>
+        <script src="scripts/script.js">
+
+        </script>
+
     <link rel="stylesheet" href="css/style.css"/>
   </head>
   <body>
@@ -25,6 +33,9 @@
                 </form>
             </div>
             <div class="messages">
+                <div class="refresh">
+                    Refresh
+                </div>
                 <div th:each="message:${msgs}" class="message">
                     <span class="author" th:text="${message.author}">author</span>
                     <span class="messageContent" th:text="${message.msg}">Some message I sent</span>

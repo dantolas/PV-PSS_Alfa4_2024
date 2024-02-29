@@ -42,7 +42,6 @@ public class RouteController {
 	}
 	@GetMapping("/")
 	public String index(Model model) { 
-        
         updateMsgs();
         updatePeers();
         model.addAttribute("msgs",msgs);
