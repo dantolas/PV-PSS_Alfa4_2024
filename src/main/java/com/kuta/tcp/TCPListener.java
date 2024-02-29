@@ -3,7 +3,6 @@ package com.kuta.tcp;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -13,9 +12,11 @@ import com.kuta.util.color.ColorMe;
 import com.kuta.vendor.GsonParser;
 
 /**
- * Class responsible for handling TCP connections to the server, receives messages and responds.
+ * Class responsible for handling a single TCP connection
+ * to the server, receives messages and responds.
  * Does not send messages, only responds.
- * Runs as a thread
+ * Is created and started as a new Thread, tasked with maintaining the connection it was created
+ * with in UDPServer.
  * */
 public class TCPListener implements Runnable{
 
@@ -51,9 +52,18 @@ public class TCPListener implements Runnable{
         this.msgLimit = server.msgLimit;
     }
 
+    /**
+     * Check listen and send timeout. If timeout limit is reached, the Thread will kill itself
+     * @param timePassed Time passed since receive or send start
+     * @throws TimeoutException
+     */
     private void checkTimeout(long timePassed) throws TimeoutException{
         if(timePassed > timeout) throw new TimeoutException("Connection timed out");
     };
+    /**
+     * Method that checks spam. If the msg limit has been reached, it will send a timeout msg
+     * to the client connected, and sleep until the end of the minute.
+     */
     private void checkSpam(){
         long currTime = System.currentTimeMillis();
         long timeSince = currTime - stopwatch;
@@ -72,6 +82,11 @@ public class TCPListener implements Runnable{
         }
 
     }
+    /**
+     * Read response on socket, with some error handling
+     * @return String of the packet content
+     * @throws TimeoutException
+     */
     private String readResponse() throws TimeoutException{
         String resp = null;
         long timeStartedWaiting = System.currentTimeMillis();
@@ -97,6 +112,10 @@ public class TCPListener implements Runnable{
         readLock.unlock();
     }
 
+    /**
+     * Handles packet that contains a new message command inside
+     * @param msg Packet content
+     */
     private void handleNewMessage(String msg){
         NewTCPMessage newMsg = GsonParser.parser.fromJson(msg,NewTCPMessage.class);
         if(!newMsg.isValid()) return;
@@ -119,6 +138,10 @@ public class TCPListener implements Runnable{
     }
 
 
+    /**
+     * Handle input read from client
+     * @param msg Packet content
+     */
     public void handle(String msg){
         try {
             handleHello(msg);
@@ -130,6 +153,9 @@ public class TCPListener implements Runnable{
         }
     }
 
+    /**
+     * Setup the TCPListener, should be used before program loop
+     */
     public void setup(){
         try {
             out = new PrintWriter(peer.getOutputStream(),true);
@@ -142,8 +168,16 @@ public class TCPListener implements Runnable{
         }
 
     }
+    /**
+     * Kill the Listener
+     */
     public void tearDown(){
         server.sysout.println(TCPh+"|Shutting down|");
+        try {
+            out.close();
+            in.close();
+        } catch (Exception e) {
+        }
     }
 
     @Override

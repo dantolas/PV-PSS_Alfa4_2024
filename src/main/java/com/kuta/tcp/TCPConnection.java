@@ -11,7 +11,9 @@ import com.kuta.udp.UDPServer;
 
 
 /**
- * TCPConnection
+ * Wrapper for a TCP Client, provides the client with more functionality in regards to
+ * managing the TCPServer outConnections list of established connections, printing information
+ * to standart out and more.
  */
 public class TCPConnection implements Comparable<TCPConnection>{
 
@@ -46,30 +48,51 @@ public class TCPConnection implements Comparable<TCPConnection>{
         lock = new MsgLock();
     }
 
+    /**
+     * @param msgHistory
+     * @param historyLocks
+     * @return
+     */
     public TCPConnection setMsgHistory(TreeMap<String,Message> msgHistory, ReadWriteLock historyLocks){
         this.msgHistory = msgHistory;
         this.historyLocks = historyLocks;
         return this;
     }
 
+    /**
+     * @param connectionsList
+     * @param lock
+     * @return
+     */
     public TCPConnection setSelfDeleting(List<TCPConnection> connectionsList,ReadWriteLock lock){
         this.connections = connectionsList;
         this.connLocks = lock;
         return this;
     }
 
+    /**
+     * Set the msglock msg field to the new message, and notifies the client waiting for the lock
+     * to send it to the other side
+     * @param message
+     */
     public void sendMessage(String message){
         synchronized(this.lock){
             this.lock.msg = message;
             lock.notify();
         }
     }
+    /**
+     * @return
+     */
     public TCPConnection setup(){
         this.client = new TCPClient(this);
         
         new Thread(client).start();
         return this;
     };
+    /**
+     * 
+     */
     public void tearDown(){
         client.tearDown();
     }
@@ -78,6 +101,7 @@ public class TCPConnection implements Comparable<TCPConnection>{
             connLocks.writeLock().lock();
             connections.remove(this);
             connLocks.writeLock().unlock();
+            client.tearDown();
         } catch (Exception e) {
         }
         try {

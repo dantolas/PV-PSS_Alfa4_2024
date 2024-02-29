@@ -5,12 +5,16 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.locks.ReadWriteLock;
 
-import com.kuta.tcp.TCPConnection.MsgLock;
 import com.kuta.tcp.TCPServer.newMsgLock;
 import com.kuta.util.color.ColorMe;
 
 /**
- * TCPSender
+ * Class responsible for sending messages.
+ * Message can be sent to anyone that a TCPClient has established connection with.
+ * The record of who is connected is kept in outConnection list.
+ *
+ * Sender waits() on a lock object that also contains the message that will be sent. After it sends
+ * the message it will wait again for another notify 
  */
 public class TCPSender implements Runnable{
 
@@ -24,6 +28,13 @@ public class TCPSender implements Runnable{
     public ReadWriteLock sendLocks;
     private boolean running;
 
+    /**
+     * @param running
+     * @param outConnections
+     * @param outLocks
+     * @param msgLock
+     * @param sysout
+     */
     public TCPSender(boolean running,List<TCPConnection> outConnections,ReadWriteLock outLocks, newMsgLock msgLock, PrintStream sysout) {
         this.running = running;
         this.outConnections = outConnections;
@@ -33,6 +44,13 @@ public class TCPSender implements Runnable{
         TCPs = ColorMe.yellow("TCPs");
     }
 
+    /**
+     * Send new message. The recipient and message are both lockated in 
+     * newMsgLock msgLock.
+     *
+     * Go over all tcp connections established with clients, find the recipient wanted, and send msg
+     * @param recipientAndMsg
+     */
     private void sendMessage(String[] recipientAndMsg){
         String recipientPeerId = recipientAndMsg[0];
         String msg = recipientAndMsg[1];
@@ -62,6 +80,9 @@ public class TCPSender implements Runnable{
     }
 
 
+    /**
+     * Setup the sender
+     */
     public void setup(){
         sysout.println(TCPs+"|Starting TCP Sender");
     }
