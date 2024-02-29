@@ -7,11 +7,13 @@ $(".refresh").on("click",()=>{
         method: "GET",
         dataType: "json",
         success: function(response) {
-            console.log(response)
+            $(".message").remove();
+            response.forEach(message => {
+                console.out(message);
+            });
         },
         error: function(status, error) {
-            // Handle any errors
-            console.error(status, error);
+            alert("Couldn't refresh page");
         }
     });
 });
