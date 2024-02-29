@@ -16,12 +16,12 @@ $(".refresh").on("click",()=>{
                 var author = $("<span></spam>");
                 var content = $("<span></spam>");
                 var id= $("<span></spam>");
-                author.class = "author";
-                author.text = message.author;
-                content.class = "messageContent";
-                content.text=message.msg;
-                id.class = "messageId";
-                id.text = message.id;
+                author.addClass("author");
+                author.text(message.author);
+                content.addClass("messageContent");
+                content.text(message.msg);
+                id.addClass("messageId");;
+                id.text(message.id);
 
                 $(newMessage).prepend(author);
                 $(newMessage).prepend(content);
