@@ -162,11 +162,11 @@ ul li:hover{
 }
 .refresh{
     position: fixed;
-    top:2;
-    right:2;
+    top:0;
+    right:0;
     background: var(--bg-primary);
     color: var(--txt-primary);
-    padding:0.4rem;
+    padding:0.5rem;
     border-radius:10px;
 }
 
