@@ -29,6 +29,7 @@ $(".refresh").on("click",()=>{
 
                 $(newMessages).prepend(newMessage);
             });
+            $(".messages").replaceWith(newMessages);
         },
         error: function(status, error) {
             alert("Couldn't refresh page");
