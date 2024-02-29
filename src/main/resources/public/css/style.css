@@ -164,7 +164,8 @@ ul li:hover{
     position: fixed;
     top:0;
     right:0;
-    margin:10px;
+    margin-top:2.5rem;
+    margin-right:2.5rem;
     background: var(--bg-primary);
     color: var(--txt-primary);
     padding:0.5rem;
