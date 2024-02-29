@@ -150,7 +150,7 @@ ul li:hover{
     width: 50%;
     border-radius: 10px;;
     border: 1px solid var(--txt-secondary);
-    height: 500px;
+    height: 80%;
     padding:1rem;
     margin-right:1rem;
     margin-top:1.5rem;
@@ -168,6 +168,8 @@ ul li:hover{
     border-radius: 10px;
     width: fit-content;
     padding:0.5rem;
+    overflow-y: auto;
+    height:100px;
 }
 
 .author{
