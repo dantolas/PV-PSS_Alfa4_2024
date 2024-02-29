@@ -10,6 +10,7 @@ $(".refresh").on("click",()=>{
             $(".message").remove();
             response.forEach(message => {
                 console.log(message);
+                console.log(message.author);
             });
         },
         error: function(status, error) {
