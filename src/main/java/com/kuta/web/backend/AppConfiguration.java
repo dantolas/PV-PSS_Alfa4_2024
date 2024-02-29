@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * AppConfiguration
+ * Setting global Spring variables this stuff is weird
  */
 @Configuration
 public class AppConfiguration {
