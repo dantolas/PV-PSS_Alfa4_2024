@@ -6,6 +6,7 @@ $(".refresh").on("click",()=>{
 
 $(".send").on("click",(event)=>{
     event.preventDefault();
+    send();
 });
 
 function send(){
