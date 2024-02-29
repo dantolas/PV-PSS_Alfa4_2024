@@ -9,10 +9,11 @@ $(".refresh").on("click",()=>{
         success: function(response) {
             $(".message").remove();
             var newMessages = $("<div></div>");
-            newMessages.class = "messages";
+            newMessages.addClass("messages");
 
             response.forEach(message => {
                 var newMessage = $("<div></div>");
+                newMessage.addClass("message");
                 var author = $("<span></spam>");
                 var content = $("<span></spam>");
                 var id= $("<span></spam>");
