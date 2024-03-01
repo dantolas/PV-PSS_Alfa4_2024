@@ -100,7 +100,6 @@ public class TCPConnection implements Comparable<TCPConnection>{
             connLocks.writeLock().lock();
             connections.remove(this);
             connLocks.writeLock().unlock();
-            client.tearDown();
         } catch (Exception e) {
         }
         try {

@@ -11,7 +11,7 @@ plugins{
 	id("io.spring.dependency-management") version "1.1.4"
 }
 application {
-    mainClass = "com.kuta.Main"
+    mainClass.set("com.kuta.Main")
 }
 repositories{
     mavenCentral()
@@ -23,23 +23,31 @@ dependencies{
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
+dependencyManagement {
+  imports {
+      mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+  }
+}
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
 }
 tasks {
-  withType<Jar> {
+    withType<JavaCompile>{
+        options.compilerArgs.add("-parameters")
+    }
+    withType<Jar> {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        manifest {
-            attributes("Main-Class" to  "com.kuta.Main")
-        }
+            manifest {
+                attributes("Main-Class" to  "com.kuta.Main")
+            }
 
         configurations["compileClasspath"].forEach { file: File ->
-        from(zipTree(file.absoluteFile))
+            from(zipTree(file.absoluteFile))
         }
     }
     bootJar{
         archiveBaseName.set("app")
-        destinationDirectory.set(file("./"))
+            destinationDirectory.set(file("./"))
     }
 }
 
